@@ -105,24 +105,24 @@ const Gameboard = function () {
 
   function receiveAttack(rowCoord, columnCoord){
     if(!areAllShipsSunk()){
-        const chosenSquare = boardSquares[rowCoord][columnCoord]
-        if(isAlreadyHit(chosenSquare)){
-            return 'Cant hit the same spot twice'
-        }
-    // If square is ocuppied, send hit to corresponding ship
-    if(chosenSquare.hasOwnProperty('ship')){
+      const chosenSquare = boardSquares[rowCoord][columnCoord];
+      if (isAlreadyHit(chosenSquare)) {
+        return "Cant hit the same spot twice";
+      }
+      // If square is ocuppied, send hit to corresponding ship
+      if (chosenSquare.hasOwnProperty("ship")) {
         // If ship was allready hit
         chosenSquare.ship.getHit(chosenSquare.shipSquare);
-     
-    } else{
+      } else {
         // If its empty, update the board
-        chosenSquare.hit = true; 
-    }
-    if(areAllShipsSunk()){
+        chosenSquare.hit = true;
+      }
+      if (areAllShipsSunk()) {
         // if ships were just sunk this turn
-        return 'Ships were just sunk'
-    }
-} 
+        return "Ships were just sunk";
+      }
+      return chosenSquare;
+    } 
     return 'Ships already sunk'
   }
 
@@ -130,8 +130,43 @@ const Gameboard = function () {
 };
 
 
-function Player(){
+function Player(gameboard, number){
 
+    function playTurn(rowCoord, columnCoord){
+        return gameboard.receiveAttack(rowCoord, columnCoord)
+    }
+
+    function getNumber(){
+        return number
+    }
+    return { playTurn, getNumber }
 }
 
-export { Ship, Gameboard, Player};
+function AIPlayer(gameboard, number){
+
+    const prototype = Player(gameboard, number)
+
+    function getRandomNumber(max = 9){
+        // random number from 1-10
+        return Math.floor(Math.random() * max);
+    }
+
+    function playRandom(){
+        let randomRow = getRandomNumber()
+        let randomColumn = getRandomNumber();
+        
+        const currentBoard = gameboard.getCurrentBoard()
+        // If those coords are occupied choose anothers
+       while(currentBoard[randomRow][randomColumn].hasOwnProperty('hit') ||
+       currentBoard[randomRow][randomColumn].hasOwnProperty('ship')){
+        randomRow = getRandomNumber();
+        randomColumn = getRandomNumber();
+       }
+
+       return(gameboard.receiveAttack(randomRow, randomColumn));
+       
+    }
+    return Object.assign(prototype, { playRandom })
+}
+
+export { Ship, Gameboard, Player, AIPlayer};
