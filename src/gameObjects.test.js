@@ -1,5 +1,5 @@
 /* eslint no-undef: 0 */
-import { Ship, Gameboard, Player, AIPlayer} from "./model";
+import { Ship, Gameboard, Player, AIPlayer } from "./model";
 
 test("Ship object returns false to sunk when created", () => {
   const newShip = Ship(3);
@@ -156,82 +156,85 @@ test("Gameboard keeps track of missed hits", () => {
   expect(currentBoard[7][8].hit).toBe(undefined);
 });
 
-
 test("Gameboard reports if all ships are sunk", () => {
-    const newGameboard = Gameboard();
-    newGameboard.placeShip(Ship(1), 8, 8);
-    newGameboard.placeShip(Ship(1), 0, 1);
+  const newGameboard = Gameboard();
+  newGameboard.placeShip(Ship(1), 8, 8);
+  newGameboard.placeShip(Ship(1), 0, 1);
 
-    // At least one ship is still floating
-    expect(newGameboard.areAllShipsSunk()).toBe(false)
-    
-    newGameboard.receiveAttack(8, 8)
+  // At least one ship is still floating
+  expect(newGameboard.areAllShipsSunk()).toBe(false);
 
-    expect(newGameboard.receiveAttack(0, 1)).toBe('Ships were just sunk')
+  newGameboard.receiveAttack(8, 8);
 
-    // All ships are sunk
-    expect(newGameboard.areAllShipsSunk()).toBe(true)
+  expect(newGameboard.receiveAttack(0, 1)).toBe("Ships were just sunk");
 
-  });
+  // All ships are sunk
+  expect(newGameboard.areAllShipsSunk()).toBe(true);
+});
 
 test("Gameboard can't add more hits if all ships are sunk", () => {
   const newGameboard = Gameboard();
   newGameboard.placeShip(Ship(1), 6, 5);
 
-  newGameboard.receiveAttack(6, 5)
+  newGameboard.receiveAttack(6, 5);
 
   // Deep copy current board
-  const currentBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()))
+  const currentBoard = JSON.parse(
+    JSON.stringify(newGameboard.getCurrentBoard())
+  );
 
   expect(newGameboard.receiveAttack(3, 3)).toBe("Ships already sunk");
-  const newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()))
-  expect(newBoard).toEqual(currentBoard)
+  const newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
+  expect(newBoard).toEqual(currentBoard);
 });
 
 test("Gameboard can't hit twice in the same spot", () => {
-    const newGameboard = Gameboard();
-    newGameboard.placeShip(Ship(3), 6, 5);
-  
-    // Hit ship square
-    newGameboard.receiveAttack(6, 5);
-    // Hit empty square
-    newGameboard.receiveAttack(0, 1);
-  
-    const currentBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()))
+  const newGameboard = Gameboard();
+  newGameboard.placeShip(Ship(3), 6, 5);
+
+  // Hit ship square
+  newGameboard.receiveAttack(6, 5);
+  // Hit empty square
+  newGameboard.receiveAttack(0, 1);
+
+  const currentBoard = JSON.parse(
+    JSON.stringify(newGameboard.getCurrentBoard())
+  );
 
   expect(newGameboard.receiveAttack(6, 5)).toBe("Cant hit the same spot twice");
   expect(newGameboard.receiveAttack(0, 1)).toBe("Cant hit the same spot twice");
-  const newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()))
-  expect(newBoard).toEqual(currentBoard)
+  const newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
+  expect(newBoard).toEqual(currentBoard);
+});
 
-  });
+test("Player.playTurn can update Gameboard", () => {
+  const newGameboard = Gameboard();
+  const newPlayer = Player(newGameboard, 1);
+  newGameboard.placeShip(Ship(2), 0, 1);
+  newPlayer.playTurn(8, 1);
 
+  // Updates empty squares
+  expect(newGameboard.getCurrentBoard()[8][1].hit).toBe(true);
 
-test('Player.playTurn can update Gameboard', () => {
-    
-    const newGameboard = Gameboard();
-    const newPlayer = Player(newGameboard, 1);
-    newGameboard.placeShip(Ship(2), 0, 1)
-    newPlayer.playTurn(8, 1);
+  // Updates ship squares
+  expect(newPlayer.playTurn(0, 2).shipSquare).toBe(1);
+  expect(newGameboard.getCurrentBoard()[0][2].ship.getSquares()).toEqual([
+    1, 0,
+  ]);
+});
 
-    // Updates empty squares
-    expect(newGameboard.getCurrentBoard()[8][1].hit).toBe(true)
+test("AIPlayer.playRandom can update Gameboard", () => {
+  const newGameboard = Gameboard();
+  newGameboard.placeShip(Ship(10), 0, 0);
+  newGameboard.placeShip(Ship(9), 1, 1, "vertical");
+  const newAIPlayer = AIPlayer(newGameboard, 1);
+  const previousBoard = JSON.parse(
+    JSON.stringify(newGameboard.getCurrentBoard())
+  );
+  newAIPlayer.playRandom();
 
-    // Updates ship squares
-    expect(newPlayer.playTurn(0, 2).shipSquare).toBe(1)
-    expect(newGameboard.getCurrentBoard()[0][2].ship.getSquares()).toEqual([1, 0])
-})
-
-
-test('AIPlayer.playRandom can update Gameboard', () => {
-    
-    const newGameboard = Gameboard();
-    newGameboard.placeShip(Ship(10), 0, 0)
-    newGameboard.placeShip(Ship(9), 1, 1, 'vertical')
-    const newAIPlayer = AIPlayer(newGameboard, 1);
-    const previousBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()))
-    newAIPlayer.playRandom();
-
-    const updatedBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()))
-    expect(updatedBoard).not.toEqual(previousBoard)
-})
+  const updatedBoard = JSON.parse(
+    JSON.stringify(newGameboard.getCurrentBoard())
+  );
+  expect(updatedBoard).not.toEqual(previousBoard);
+});

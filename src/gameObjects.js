@@ -6,11 +6,11 @@ const Ship = function (length) {
   function isSunk() {
     sunk = shipSquares.every((hit) => hit === 0);
     return sunk;
-  };
+  }
 
   function getLength() {
     return length;
-  };
+  }
 
   function getHit(index) {
     // Only if index is not out of bounds
@@ -20,13 +20,13 @@ const Ship = function (length) {
     shipSquares[index] = 0;
     // if every square is hit, sunk returns true
     return shipSquares;
-  };
-
-  const getSquares = function(){
-    return shipSquares
   }
 
-  return { isSunk, getLength, getHit, getSquares};
+  const getSquares = function () {
+    return shipSquares;
+  };
+
+  return { isSunk, getLength, getHit, getSquares };
 };
 
 const Gameboard = function () {
@@ -40,7 +40,7 @@ const Gameboard = function () {
     return boardSquares;
   };
 
-  function areAllShipsSunk(){
+  function areAllShipsSunk() {
     // Checks if every ship in the board is sunk
     return boardSquares.every((row) =>
       row.every((square) => {
@@ -52,17 +52,22 @@ const Gameboard = function () {
     );
   }
 
-  function isAlreadyHit(square){
+  function isAlreadyHit(square) {
     const isEmptyAndWasHit = square.hit === true;
-    const isShipAndWasHit = (square.ship !== undefined && square.ship.getSquares()[square.shipSquare] === 0)
-    return  isEmptyAndWasHit || isShipAndWasHit
+    const isShipAndWasHit =
+      square.ship !== undefined &&
+      square.ship.getSquares()[square.shipSquare] === 0;
+    return isEmptyAndWasHit || isShipAndWasHit;
   }
 
   function isBlocked(length, rowCoord, columnCoord, direction) {
     let subArray;
     if (direction === "horizontal") {
       // get row
-      subArray = boardSquares[rowCoord].slice(columnCoord, columnCoord + length);
+      subArray = boardSquares[rowCoord].slice(
+        columnCoord,
+        columnCoord + length
+      );
     } else {
       // get only relevant rows
       subArray = boardSquares.filter(
@@ -74,10 +79,12 @@ const Gameboard = function () {
       );
       subArray = subArray.flat();
     }
-    const isAnyOccupied = subArray.some((square) => square.hasOwnProperty('ship'));
+    const isAnyOccupied = subArray.some((square) =>
+      square.hasOwnProperty("ship")
+    );
     const isOutOfBounds = subArray.length !== length;
     return isAnyOccupied || isOutOfBounds;
-  };
+  }
 
   function placeShip(ship, rowCoord, columnCoord, direction = "horizontal") {
     const length = ship.getLength();
@@ -86,25 +93,23 @@ const Gameboard = function () {
       if (direction === "horizontal") {
         for (let i = 0; i < length; i++) {
           // Update list that keeps track of indices corresponding in ships
-          const positionObject = boardSquares[rowCoord][i + columnCoord]
+          const positionObject = boardSquares[rowCoord][i + columnCoord];
           positionObject.ship = ship;
           positionObject.shipSquare = i;
         }
-      } else if (direction === "vertical"){
+      } else if (direction === "vertical") {
         // if direction is vertical
         for (let i = 0; i < length; i++) {
-          const positionObject = boardSquares[rowCoord + i][columnCoord]
+          const positionObject = boardSquares[rowCoord + i][columnCoord];
           positionObject.ship = ship;
           positionObject.shipSquare = i;
-          
         }
       }
     }
-  };
+  }
 
-
-  function receiveAttack(rowCoord, columnCoord){
-    if(!areAllShipsSunk()){
+  function receiveAttack(rowCoord, columnCoord) {
+    if (!areAllShipsSunk()) {
       const chosenSquare = boardSquares[rowCoord][columnCoord];
       if (isAlreadyHit(chosenSquare)) {
         return "Cant hit the same spot twice";
@@ -122,51 +127,49 @@ const Gameboard = function () {
         return "Ships were just sunk";
       }
       return chosenSquare;
-    } 
-    return 'Ships already sunk'
+    }
+    return "Ships already sunk";
   }
 
-  return { getCurrentBoard, placeShip, receiveAttack, areAllShipsSunk};
+  return { getCurrentBoard, placeShip, receiveAttack, areAllShipsSunk };
 };
 
+function Player(gameboard, number) {
+  function playTurn(rowCoord, columnCoord) {
+    return gameboard.receiveAttack(rowCoord, columnCoord);
+  }
 
-function Player(gameboard, number){
-
-    function playTurn(rowCoord, columnCoord){
-        return gameboard.receiveAttack(rowCoord, columnCoord)
-    }
-
-    function getNumber(){
-        return number
-    }
-    return { playTurn, getNumber }
+  function getNumber() {
+    return number;
+  }
+  return { playTurn, getNumber };
 }
 
-function AIPlayer(gameboard, number){
+function AIPlayer(gameboard, number) {
+  const prototype = Player(gameboard, number);
 
-    const prototype = Player(gameboard, number)
+  function getRandomNumber(max = 9) {
+    // random number from 1-10
+    return Math.floor(Math.random() * max);
+  }
 
-    function getRandomNumber(max = 9){
-        // random number from 1-10
-        return Math.floor(Math.random() * max);
+  function playRandom() {
+    let randomRow = getRandomNumber();
+    let randomColumn = getRandomNumber();
+
+    const currentBoard = gameboard.getCurrentBoard();
+    // If those coords are occupied choose anothers
+    while (
+      currentBoard[randomRow][randomColumn].hasOwnProperty("hit") ||
+      currentBoard[randomRow][randomColumn].hasOwnProperty("ship")
+    ) {
+      randomRow = getRandomNumber();
+      randomColumn = getRandomNumber();
     }
 
-    function playRandom(){
-        let randomRow = getRandomNumber()
-        let randomColumn = getRandomNumber();
-        
-        const currentBoard = gameboard.getCurrentBoard()
-        // If those coords are occupied choose anothers
-       while(currentBoard[randomRow][randomColumn].hasOwnProperty('hit') ||
-       currentBoard[randomRow][randomColumn].hasOwnProperty('ship')){
-        randomRow = getRandomNumber();
-        randomColumn = getRandomNumber();
-       }
-
-       return(gameboard.receiveAttack(randomRow, randomColumn));
-       
-    }
-    return Object.assign(prototype, { playRandom })
+    return gameboard.receiveAttack(randomRow, randomColumn);
+  }
+  return Object.assign(prototype, { playRandom });
 }
 
-export { Ship, Gameboard, Player, AIPlayer};
+export { Ship, Gameboard, Player, AIPlayer };
