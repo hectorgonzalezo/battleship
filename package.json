@@ -27,6 +27,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "html-webpack-plugin": "^5.5.0",
+    "identity-obj-proxy": "^3.0.0",
     "prettier": "2.7.1",
     "style-loader": "^3.3.1",
     "webpack": "^5.74.0",
@@ -34,7 +35,16 @@
     "webpack-dev-server": "^4.10.1"
   },
   "dependencies": {
+    "babel-jest": "^29.0.3",
     "pubsub-js": "^1.9.4"
   },
-  "description": ""
+  "description": "",
+ "jest": {
+    "moduleFileExtensions": ["js", "jsx"],
+    "moduleDirectories": ["node_modules", "bower_components", "shared"],
+    "moduleNameMapper": {
+      "\\.(css|less)$": "<rootDir>/__mocks__/styleMock.js",
+      "\\.(gif|ttf|eot|svg)$": "<rootDir>/__mocks__/fileMock.js"
+    }
+  }
 }

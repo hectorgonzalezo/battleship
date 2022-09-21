@@ -1,5 +1,7 @@
 @import "./reset.css";
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
 :root {
   --board-gap: 2px;
   --board-size: calc(430px + calc(var(--board-gap) * 10));
@@ -14,30 +16,48 @@
   --color-complementary1-dark: rgb(14, 60, 13);
   --color-complementary2-light: rgb(245, 176, 118);
   --color-complementary2-dark: rgb(131, 63, 14);
-  font-family: "Maven Pro", sans-serif;
+  font-family: 'Roboto', sans-serif;
+
 }
 
 /* * {
     outline: dashed red;
-} */
+} */ 
+body{
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+    color: var(--color-light)
+}
 
-body {
+#game {
   background-color: var(--color-background);
   height: 100vh;
   width: 100vw;
   display: grid;
   grid-template-rows: 100px 1fr 50px;
-  justify-items: center;
+  align-items: center;
 }
 
+.inactive{
+    opacity: 0;
+}
 header {
 }
 
 main {
   width: 100%;
-  display: flex;
+  display: grid;
+  grid-template-rows: 50px 1fr;
+  grid-template-columns: repeat(2, 1fr);
+  justify-items: center;
+  gap: auto;
   align-items: center;
-  justify-content: space-evenly;
+}
+
+main > h1{
+    color: var(--color-light);
+    grid-row: 1 / 2;
 }
 
 .board {
@@ -84,11 +104,72 @@ footer {
   height: 30px;
 }
 
+
+#pop-up{
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--color-background);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,  -50%);
+    display: grid;
+    justify-items: center;
+    grid-template-rows: 1fr 50px 8fr;
+    grid-template-columns: 2fr 1fr;
+    grid-template-areas: 
+                        "title title"
+                        "description description"
+                        "board ships"
+
+}
+#pop-up article{
+    grid-area: title;
+}
+
+#pop-up h3{
+    grid-area: description;
+}
+
+#pop-up .board{
+    grid-area: board;
+}
+
+#ships{
+    grid-area: ships;
+}
+
+#pop-up article {
+    background: linear-gradient(
+      to bottom, 
+      rgb(135, 135, 236),
+      var(--color-water)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+  }
+
+#title{
+    font-size: 3rem;
+    font-weight: bold;
+    letter-spacing: 0.3rem;
+    padding: 20px;
+}
+
+
+.ship-square{
+    width: var(--board-size);
+    height: var(--board-size)
+}
+
+
 @media only screen and (max-width: 950px) {
   main {
+    display: flex;
     flex-direction: column;
     height: 100%;
     justify-content: space-evenly;
-    gap: 50px;
+    gap: 30px;
   }
 }

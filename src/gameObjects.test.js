@@ -1,5 +1,5 @@
 /* eslint no-undef: 0 */
-import { Ship, Gameboard, Player, AIPlayer } from "./model";
+import { Ship, Gameboard, Player, AIPlayer } from "./gameObjects";
 
 test("Ship object returns false to sunk when created", () => {
   const newShip = Ship(3);
