@@ -3,23 +3,22 @@ const Ship = function (length) {
   const shipSquares = new Array(length).fill(1);
   let sunk = false;
 
-  const isSunk = function () {
+  function isSunk() {
     sunk = shipSquares.every((hit) => hit === 0);
     return sunk;
   };
 
-  const getLength = function () {
+  function getLength() {
     return length;
   };
 
-  const getHit = function (index) {
+  function getHit(index) {
     // Only if index is not out of bounds
     if (index >= length || index < 0) {
       return shipSquares;
     }
     shipSquares[index] = 0;
     // if every square is hit, sunk returns true
-    console.log(shipSquares)
     return shipSquares;
   };
 
@@ -31,28 +30,42 @@ const Ship = function (length) {
 };
 
 const Gameboard = function () {
-  // board is a 10x10 2d array of zeros
-  const board = Array(10)
-    .fill()
-    .map(() => Array(10).fill(0));
   // Keeps track of which ship is where.
-  const positionGraph = Array(10)
+  // 10X10 2d array of empty objects
+  const boardSquares = Array(10)
     .fill()
     .map(() => [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]);
 
   const getCurrentBoard = function () {
-    return board;
+    return boardSquares;
   };
 
+  function areAllShipsSunk(){
+    // Checks if every ship in the board is sunk
+    return boardSquares.every((row) =>
+      row.every((square) => {
+        if (square.ship !== undefined) {
+          return square.ship.isSunk();
+        }
+        return true;
+      })
+    );
+  }
 
-  const isBlocked = function (length, rowCoord, columnCoord, direction) {
+  function isAlreadyHit(square){
+    const isEmptyAndWasHit = square.hit === true;
+    const isShipAndWasHit = (square.ship !== undefined && square.ship.getSquares()[square.shipSquare] === 0)
+    return  isEmptyAndWasHit || isShipAndWasHit
+  }
+
+  function isBlocked(length, rowCoord, columnCoord, direction) {
     let subArray;
     if (direction === "horizontal") {
       // get row
-      subArray = board[rowCoord].slice(columnCoord, columnCoord + length);
+      subArray = boardSquares[rowCoord].slice(columnCoord, columnCoord + length);
     } else {
       // get only relevant rows
-      subArray = board.filter(
+      subArray = boardSquares.filter(
         (row, i) => i >= rowCoord && i < rowCoord + length
       );
       // get only relevant columns
@@ -61,30 +74,28 @@ const Gameboard = function () {
       );
       subArray = subArray.flat();
     }
-    const isAnyOccupied = subArray.some((square) => square === 1);
+    const isAnyOccupied = subArray.some((square) => square.hasOwnProperty('ship'));
     const isOutOfBounds = subArray.length !== length;
     return isAnyOccupied || isOutOfBounds;
   };
 
-  const placeShip = function (ship, rowCoord, columnCoord, direction) {
+  function placeShip(ship, rowCoord, columnCoord, direction = "horizontal") {
     const length = ship.getLength();
     // Change board only if space is not occupied or it doesn't go out of bounds
     if (!isBlocked(length, rowCoord, columnCoord, direction)) {
       if (direction === "horizontal") {
         for (let i = 0; i < length; i++) {
-          board[rowCoord][i + columnCoord] = 1;
           // Update list that keeps track of indices corresponding in ships
-          const positionObject = positionGraph[rowCoord][i + columnCoord]
-          console.log(positionObject)
+          const positionObject = boardSquares[rowCoord][i + columnCoord]
           positionObject.ship = ship;
           positionObject.shipSquare = i;
         }
-      } else {
+      } else if (direction === "vertical"){
         // if direction is vertical
         for (let i = 0; i < length; i++) {
-          board[rowCoord + i][columnCoord] = 1;
-          positionGraph[rowCoord + 1][columnCoord].ship = ship;
-          positionGraph[rowCoord + 1][columnCoord].shipSquare = i;
+          const positionObject = boardSquares[rowCoord + i][columnCoord]
+          positionObject.ship = ship;
+          positionObject.shipSquare = i;
           
         }
       }
@@ -92,16 +103,35 @@ const Gameboard = function () {
   };
 
 
-  const receiveAttack = function(rowCoord, columnCoord){
+  function receiveAttack(rowCoord, columnCoord){
+    if(!areAllShipsSunk()){
+        const chosenSquare = boardSquares[rowCoord][columnCoord]
+        if(isAlreadyHit(chosenSquare)){
+            return 'Cant hit the same spot twice'
+        }
     // If square is ocuppied, send hit to corresponding ship
-    if(board[rowCoord][columnCoord] === 1){
-        // console.log(positionGraph)
-        const shipInfo = positionGraph[rowCoord][columnCoord];
-        return shipInfo.ship.getHit(shipInfo.shipSquare)
+    if(chosenSquare.hasOwnProperty('ship')){
+        // If ship was allready hit
+        chosenSquare.ship.getHit(chosenSquare.shipSquare);
+     
+    } else{
+        // If its empty, update the board
+        chosenSquare.hit = true; 
     }
+    if(areAllShipsSunk()){
+        // if ships were just sunk this turn
+        return 'Ships were just sunk'
+    }
+} 
+    return 'Ships already sunk'
   }
 
-  return { getCurrentBoard, placeShip, receiveAttack};
+  return { getCurrentBoard, placeShip, receiveAttack, areAllShipsSunk};
 };
 
-export { Ship, Gameboard };
+
+function Player(){
+
+}
+
+export { Ship, Gameboard, Player};
