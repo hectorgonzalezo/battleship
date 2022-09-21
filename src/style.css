@@ -22,7 +22,8 @@
 
 /* * {
     outline: dashed red;
-} */ 
+}  */
+
 body{
     position: relative;
     height: 100vh;
@@ -41,6 +42,7 @@ body{
 
 .inactive{
     opacity: 0;
+    transform: translate(-100%)
 }
 header {
 }
@@ -123,6 +125,10 @@ footer {
                         "board ships"
 
 }
+
+#pop-up{
+
+}
 #pop-up article{
     grid-area: title;
 }
@@ -157,10 +163,29 @@ footer {
     padding: 20px;
 }
 
+#ships{
+    display: grid;  
+    align-items: center;
+    justify-items: start;
+}
 
+#ships .ship{
+    display: flex;
+    gap: var(--board-gap);
+}
+
+.ship.dragging{
+    opacity: 0.5;
+}
+
+#ships > .multiple-ships{
+    display: flex;
+    gap: 50px;
+}
 .ship-square{
-    width: var(--board-size);
-    height: var(--board-size)
+    width: calc(var(--board-size) / 10);
+    height: calc(var(--board-size) / 10);
+    background-color: blue;
 }
 
 
