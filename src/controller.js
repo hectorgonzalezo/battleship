@@ -7,22 +7,42 @@ const popupShips = document.querySelectorAll("#ships .ship");
 const popupBoard = document.querySelector("#pop-up .board");
 
 
+// Player 2 turn
+async function play2(){
+    // play 2
+    view.updateDisplay("Player2 turn");
+    setTimeout(() => {
+      const coords = model.player2.playRandom();
+      if(model.player1Board.areAllShipsSunk()){
+        // If player 2 won stop the game
+        view.updateDisplay('Sorry, you lost!')
+    } else{
+      makeEnemySquaresClickable();
+      view.updateBoardAt(model.player1Board, coords[0], coords[1]);
+    }
+    }, (Math.random() * 1000) + 1000);
+}
 
+// Listener allows for player to play turn
 function enemySquaresListener(event){
     const square = event.target;
     const rowCoord = square.parentElement.getAttribute('data');
     const columnCoord = square.getAttribute('data');
-    const player1 = model.player1;
     // Attack selected square
-    player1.playTurn(rowCoord, columnCoord);
+    model.player1.playTurn(rowCoord, columnCoord);
     // Show hit on webpage
     view.updateBoardAt(model.player2Board, rowCoord, columnCoord);
     if(model.player2Board.areAllShipsSunk()){
-        console.log('you won')
-    } else{
-        makeEnemySquaresUnclickable();
-        play2Generator.next();
+        // If you won
+        view.updateDisplay('You won!')
+    } else if(model.player1Board.areAllShipsSunk()){
+        // If player 2 won
+        view.updateDisplay('Sorry, you lost!')
+    } else {
+        // If nobody won, continue playing
+        play2();
     }
+    makeEnemySquaresUnclickable();
 }
 
 
@@ -31,7 +51,7 @@ function makeEnemySquaresClickable(){
     enemySquares.forEach(square => {
         square.addEventListener('click', enemySquaresListener);
     });
-    // view.updateDisplay('Your turn')
+    view.updateDisplay('Your turn')
 }
 
 function makeEnemySquaresUnclickable(){
@@ -41,20 +61,7 @@ function makeEnemySquaresUnclickable(){
     });
 }
 
-// Generator that controls who plays next turn
-function* play2(){
-    const player2 = model.player2;
-    while(true){
-            //play 2
-            view.updateDisplay('Player2 turn')
-            const coords = player2.playRandom();
-            makeEnemySquaresClickable();
-            view.updateBoardAt(model.player1Board, coords[0], coords[1]);
-            yield
-    }
-}
 
-const play2Generator = play2();
 
 // Drag and drop event listeners
 popupShips.forEach((ship) => {

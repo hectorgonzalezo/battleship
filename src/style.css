@@ -62,6 +62,10 @@ header > div{
     border-radius: 1rem;
 }
 
+header > button{
+    background-color: red;
+}
+
 main {
   width: 100%;
   display: grid;
@@ -101,12 +105,19 @@ main > h1 {
     background-color: blue;
   }
 
+
 .square.ship-square.hit{
     background-color: green;
 }
 .square.hit{
+    transition: all 1s;
     background-color: yellow;
 }
+
+.square.hit.just-hit{
+    background-color: red;
+}
+
 
 .square:hover {
   background-color: var(--color-water-dark);

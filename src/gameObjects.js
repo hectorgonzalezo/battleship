@@ -210,11 +210,13 @@ function AIPlayer(oponentGameboard, number) {
   function playRandom() {
     let randomRow = getRandomNumber();
     let randomColumn = getRandomNumber();
+    let tentativeLocation = oponentGameboard.getCurrentBoard()[randomRow][randomColumn];
 
     // If those coords are occupied choose anothers
-    while (hitChecker.isAlreadyHit(randomRow, randomColumn)) {
+    while(hitChecker.isAlreadyHit(tentativeLocation)){
       randomRow = getRandomNumber();
       randomColumn = getRandomNumber();
+      tentativeLocation = oponentGameboard.getCurrentBoard()[randomRow][randomColumn];
     }
 
     oponentGameboard.receiveAttack(randomRow, randomColumn);

@@ -1,4 +1,3 @@
-import PubSub from "pubsub-js";
 import view from './view'
 import { Player, AIPlayer, Gameboard } from './gameObjects'
 
