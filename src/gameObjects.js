@@ -31,7 +31,7 @@ const Ship = function (length) {
   return { isSunk, getLength, getHit, getSquares };
 };
 
-const Gameboard = function () {
+const Gameboard = function (associatedDiv) {
   // Keeps track of which ship is where.
   // 10X10 2d array of empty objects
   const boardSquares = Array(10)
@@ -41,6 +41,10 @@ const Gameboard = function () {
   const getCurrentBoard = function () {
     return boardSquares;
   };
+
+  const getDiv = function(){
+    return associatedDiv
+  }
 
   function areAllShipsSunk() {
     // Checks if every ship in the board is sunk
@@ -62,29 +66,49 @@ const Gameboard = function () {
     return isEmptyAndWasHit || isShipAndWasHit;
   }
 
+  // gets only items from row, from start -1 to start + length + 1
+  function getSurroundingSquares(row, start, length){
+    const array = [];
+    [-1, 0, 1].forEach(num => {
+        // only get squares inside bounds
+        if((row + num >= 0) && (row + num <= 9)){
+            const currentRow = boardSquares[row + num].slice((start - 1), (start + length + 1))
+            array.push(currentRow)
+        }
+    })
+    return array.flat();
+  }
+
   function isBlocked(length, rowCoord, columnCoord, direction) {
     let subArray;
+    let offendingSquares;
     if (direction === "horizontal") {
-      // get row
-      subArray = boardSquares[rowCoord].slice(
-        columnCoord,
-        columnCoord + length
-      );
+      // get row, including surrounding squares
+      subArray = getSurroundingSquares(rowCoord, columnCoord, length);
+      offendingSquares = boardSquares[rowCoord].slice(columnCoord, columnCoord + length);
     } else {
       // get only relevant rows
       subArray = boardSquares.filter(
+        (row, i) => i >= (rowCoord - 1) && i < (rowCoord + length + 1)
+      );
+      offendingSquares = boardSquares.filter(
         (row, i) => i >= rowCoord && i < rowCoord + length
       );
       // get only relevant columns
       subArray = subArray.map((row) =>
-        row.filter((column, i) => i === columnCoord)
+        row.filter((column, i) => i >= (columnCoord - 1) || i <= (columnCoord + 1))
       );
-      subArray = subArray.flat();
-    }
-    const isAnyOccupied = subArray.some((square) =>
-      square.hasOwnProperty("ship")
+      offendingSquares = offendingSquares.map((row) =>
+      row.filter((column, i) => i === columnCoord)
     );
-    const isOutOfBounds = subArray.length !== length;
+      subArray = subArray.flat();
+      offendingSquares = offendingSquares.flat();
+    }
+
+    const isAnyOccupied = subArray.some((square) => square.hasOwnProperty("ship")
+    );
+    const isOutOfBounds = offendingSquares.length !== length;
+    
     return isAnyOccupied || isOutOfBounds;
   }
 
@@ -136,7 +160,7 @@ const Gameboard = function () {
   }
 
   // Populates the gameboard with number ships
-  function placeRandomShips(number){
+  function placeRandomShips(number = 1){
     const ships = [];
     // place ships until there are six in board
     while (ships.length !== number){
@@ -154,7 +178,7 @@ const Gameboard = function () {
     return ships
   }
 
-  return { getCurrentBoard, placeShip, receiveAttack, areAllShipsSunk, placeRandomShips};
+  return { getCurrentBoard, getDiv, placeShip, receiveAttack, areAllShipsSunk, placeRandomShips};
 };
 
 function Player(gameboard, number) {

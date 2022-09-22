@@ -90,30 +90,51 @@ describe("Gameboard funcionality", () => {
     newGameboard.placeShip(Ship(5), 0, 0, "horizontal");
     newGameboard.placeShip(Ship(3), 2, 3, "vertical");
 
-    const initialBoard = newGameboard.getCurrentBoard();
+    const initialBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
 
     // Don't update if ship is to big for available space horizontally
-    newGameboard.placeShip(Ship(3), 2, 2, "horizontal");
-    expect(newGameboard.getCurrentBoard()).toEqual(initialBoard);
+    newGameboard.placeShip(Ship(4), 2, 1, "horizontal");
+    let newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
+    expect(newBoard).toEqual(initialBoard);
 
     newGameboard.placeShip(Ship(3), 5, 6, "horizontal");
+    const previousBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
     // Don't update if ship is to big for available space vertically
     newGameboard.placeShip(Ship(5), 4, 7, "vertical");
-    expect(newGameboard.getCurrentBoard()).toEqual(initialBoard);
+    newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
+
+    expect(newBoard).toEqual(previousBoard);
 
     // Don't update if ship is to big for board bounds
-    newGameboard.placeShip(Ship(3), 9, 2, "vertical");
-    expect(newGameboard.getCurrentBoard()).toEqual(initialBoard);
+    console.log(newGameboard.placeShip(Ship(3), 9, 2, "vertical"))
+    newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
+    expect(newBoard).toEqual(previousBoard);
+  });
+
+  test("Gameboard not updated when ship is placed right beside another", () => {
+    const newGameboard = Gameboard();
+    newGameboard.placeShip(Ship(1), 0, 0, "horizontal");
+    newGameboard.placeShip(Ship(1), 2, 0, "vertical");
+
+    const initialBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
+
+    newGameboard.placeShip(Ship(3), 3, 1, "vertical");
+
+    const newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
+
+    expect(newBoard).toEqual(initialBoard);
   });
 
   test("Gameboard not updated when ship is with a typo on direction", () => {
     const newGameboard = Gameboard();
 
-    const initialBoard = newGameboard.getCurrentBoard();
+    const initialBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
 
     // Don't update if ship is to big for available space horizontally
     newGameboard.placeShip(Ship(3), 2, 2, "horizon");
-    expect(newGameboard.getCurrentBoard()).toEqual(initialBoard);
+    const newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
+
+    expect(newBoard).toEqual(initialBoard);
   });
 
   test("Gameboard receiveAttack hits a ship", () => {
@@ -143,6 +164,7 @@ describe("Gameboard funcionality", () => {
     newGameboard.receiveAttack(8, 8);
     expect(newShip.isSunk()).toEqual(true);
   });
+
   test("Gameboard keeps track of missed hits", () => {
     const newGameboard = Gameboard();
     // place a ship horizontally

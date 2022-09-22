@@ -181,8 +181,6 @@ footer {
   gap: 50px;
 }
 .ship-square {
-  width: calc(var(--board-size) / 10);
-  height: calc(var(--board-size) / 10);
   background-color: blue;
 }
 

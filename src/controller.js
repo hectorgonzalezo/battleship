@@ -6,8 +6,9 @@ const popupBoard = document.querySelector("#pop-up .board");
 function addShip(size, coordRow, coordColumn, direction) {
   // view.renderShip(size, coordRow, coordColumn)
 }
-const a = 1;
 
+
+// Drag and drop event listeners
 popupShips.forEach((ship) => {
   ship.addEventListener("dragstart", (e) => {
     // grey out ship when dragging
