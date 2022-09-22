@@ -72,7 +72,7 @@ const Gameboard = function (associatedDiv) {
     [-1, 0, 1].forEach(num => {
         // only get squares inside bounds
         if((row + num >= 0) && (row + num <= 9)){
-            const currentRow = boardSquares[row + num].slice((start - 1), (start + length + 1))
+            const currentRow = boardSquares[row + num].slice(Math.max(0, (start - 1)), Math.min(10, (start + length + 1)))
             array.push(currentRow)
         }
     })
@@ -89,14 +89,14 @@ const Gameboard = function (associatedDiv) {
     } else {
       // get only relevant rows
       subArray = boardSquares.filter(
-        (row, i) => i >= (rowCoord - 1) && i < (rowCoord + length + 1)
+        (row, i) => i >= Math.max(0, (rowCoord - 1)) && i < Math.min(10, (rowCoord + length + 1))
       );
       offendingSquares = boardSquares.filter(
         (row, i) => i >= rowCoord && i < rowCoord + length
       );
       // get only relevant columns
       subArray = subArray.map((row) =>
-        row.filter((column, i) => i >= (columnCoord - 1) || i <= (columnCoord + 1))
+        row.filter((column, i) => i >= Math.max(0, (columnCoord - 1)) || i <= Math.min(9, (columnCoord + 1)))
       );
       offendingSquares = offendingSquares.map((row) =>
       row.filter((column, i) => i === columnCoord)
@@ -104,6 +104,8 @@ const Gameboard = function (associatedDiv) {
       subArray = subArray.flat();
       offendingSquares = offendingSquares.flat();
     }
+
+    // console.log(subArray)
 
     const isAnyOccupied = subArray.some((square) => square.hasOwnProperty("ship")
     );
@@ -167,7 +169,7 @@ const Gameboard = function (associatedDiv) {
         const randomLength = getRandomNumber(4) + 1;
         const randomRowCoord = getRandomNumber(9);
         const randomColumnCoord = getRandomNumber(9);
-        const randomDirection = ['horizontal', 'vertical'][getRandomNumber(2)];
+        const randomDirection = ['horizontal', 'vertical'][getRandomNumber(1)];
 
         const ship = placeShip(Ship(randomLength), randomRowCoord, randomColumnCoord, randomDirection);
         // If ship was succesfully placed, append it to array

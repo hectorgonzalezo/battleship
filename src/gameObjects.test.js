@@ -121,8 +121,18 @@ describe("Gameboard funcionality", () => {
     newGameboard.placeShip(Ship(3), 3, 1, "vertical");
 
     const newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
-
     expect(newBoard).toEqual(initialBoard);
+    
+  });
+
+  test('Gameboard not updated when ship is placed right on top of another', () => {
+    const newGameboard = Gameboard();
+    newGameboard.placeShip(Ship(3), 7, 0, 'vertical');
+    const previousBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
+
+    newGameboard.placeShip(Ship(2), 9, 0, 'horizontal');
+    const laterBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
+    expect(laterBoard).toEqual(previousBoard);
   });
 
   test("Gameboard not updated when ship is with a typo on direction", () => {

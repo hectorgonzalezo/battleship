@@ -43,8 +43,8 @@ function renderShips(board){
 }
 
 function renderRandomShips(){
-    player1Board.placeRandomShips(5);
-    player2Board.placeRandomShips(5);
+    player1Board.placeRandomShips(6);
+    player2Board.placeRandomShips(6);
 
   renderShips(player1Board);
   renderShips(player2Board);
