@@ -6,10 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
-
   <body>
     <div id="game">
-      <header></header>
+      <header>
+        <div>
+            <h3>Your turn!</h3>
+        </div>
+      </header>
       <main>
         <h1>Player's Board</h1>
         <div id="player1-board" class="board"></div>
@@ -18,7 +21,7 @@
       </main>
       <footer>
         <h2>Héctor González Orozco</h2>
-        <a href="https://github.com/hectorgonzalezo/weather-app">
+        <a href="https://github.com/hectorgonzalezo/battleship">
           <img alt="github logo" id="github-logo"
           src=<%=require("./assets/github-logo.png")%> >
         </a>
