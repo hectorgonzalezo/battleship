@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 /* eslint no-undef: 0 */
 import { Ship, Gameboard, Player, AIPlayer } from "./gameObjects";
 

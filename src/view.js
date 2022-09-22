@@ -53,6 +53,10 @@ function updateBoardAt(board, rowCoord, columnCoord){
                 shipSquare.classList.add('hit')
 }
 
+function updateDisplay(string){
+    infoDisplay.innerText = string;
+}
+
 
 async function renderRandomShips(player1Board, player2Board){
   await renderShips(player1Board);
@@ -68,6 +72,6 @@ function startBoards(player1Board, player2Board) {
 }
 
 
-const view = { startBoards, renderShips, updateBoardAt};
+const view = { startBoards, renderShips, updateBoardAt, updateDisplay};
 
 export default view

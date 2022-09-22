@@ -7,8 +7,6 @@ const popupShips = document.querySelectorAll("#ships .ship");
 const popupBoard = document.querySelector("#pop-up .board");
 
 
-let enemySquares;
-
 
 function enemySquaresListener(event){
     const square = event.target;
@@ -21,16 +19,42 @@ function enemySquaresListener(event){
     view.updateBoardAt(model.player2Board, rowCoord, columnCoord);
     if(model.player2Board.areAllShipsSunk()){
         console.log('you won')
+    } else{
+        makeEnemySquaresUnclickable();
+        play2Generator.next();
     }
 }
 
+
 function makeEnemySquaresClickable(){
-    enemySquares = document.querySelectorAll('.square.enemy');
+    const enemySquares = document.querySelectorAll('.square.enemy');
     enemySquares.forEach(square => {
         square.addEventListener('click', enemySquaresListener);
     });
+    // view.updateDisplay('Your turn')
 }
 
+function makeEnemySquaresUnclickable(){
+    const enemySquares = document.querySelectorAll('.square.enemy');
+    enemySquares.forEach(square => {
+        square.removeEventListener('click', enemySquaresListener);
+    });
+}
+
+// Generator that controls who plays next turn
+function* play2(){
+    const player2 = model.player2;
+    while(true){
+            //play 2
+            view.updateDisplay('Player2 turn')
+            const coords = player2.playRandom();
+            makeEnemySquaresClickable();
+            view.updateBoardAt(model.player1Board, coords[0], coords[1]);
+            yield
+    }
+}
+
+const play2Generator = play2();
 
 // Drag and drop event listeners
 popupShips.forEach((ship) => {

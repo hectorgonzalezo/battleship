@@ -1,5 +1,19 @@
 import getRandomNumber from './getRandomNumber';
 
+const hitChecker = (
+    function hitChecker() {
+
+        function isAlreadyHit(square) {
+            const isEmptyAndWasHit = square.hit === true;
+            const isShipAndWasHit =
+              square.ship !== undefined &&
+              square.ship.getSquares()[square.shipSquare] === 0;
+            return isEmptyAndWasHit || isShipAndWasHit;
+          }
+          return { isAlreadyHit }
+    }
+)()
+
 const Ship = function (length) {
   // Array full with ones,
   const shipSquares = new Array(length).fill(1);
@@ -57,14 +71,6 @@ const Gameboard = function(playerNumber) {
         return true;
       })
     );
-  }
-
-  function isAlreadyHit(square) {
-    const isEmptyAndWasHit = square.hit === true;
-    const isShipAndWasHit =
-      square.ship !== undefined &&
-      square.ship.getSquares()[square.shipSquare] === 0;
-    return isEmptyAndWasHit || isShipAndWasHit;
   }
 
   // gets only items from row, from start -1 to start + length + 1
@@ -142,7 +148,7 @@ const Gameboard = function(playerNumber) {
   function receiveAttack(rowCoord, columnCoord) {
     if (!areAllShipsSunk()) {
       const chosenSquare = boardSquares[rowCoord][columnCoord];
-      if (isAlreadyHit(chosenSquare)) {
+      if (hitChecker.isAlreadyHit(chosenSquare)) {
         return "Cant hit the same spot twice";
       }
       // If square is ocuppied, send hit to corresponding ship
@@ -186,6 +192,7 @@ const Gameboard = function(playerNumber) {
 
 function Player(oponentGameboard, number) {
   function playTurn(rowCoord, columnCoord) {
+    // Returns ship being hit
     return oponentGameboard.receiveAttack(rowCoord, columnCoord);
   }
 
@@ -195,24 +202,24 @@ function Player(oponentGameboard, number) {
   return { playTurn, getNumber };
 }
 
+
+
 function AIPlayer(oponentGameboard, number) {
   const prototype = Player(oponentGameboard, number);
-  
+
   function playRandom() {
     let randomRow = getRandomNumber();
     let randomColumn = getRandomNumber();
 
-    const currentBoard = oponentGameboard.getCurrentBoard();
     // If those coords are occupied choose anothers
-    while (
-      currentBoard[randomRow][randomColumn].hasOwnProperty("hit") ||
-      currentBoard[randomRow][randomColumn].hasOwnProperty("ship")
-    ) {
+    while (hitChecker.isAlreadyHit(randomRow, randomColumn)) {
       randomRow = getRandomNumber();
       randomColumn = getRandomNumber();
     }
 
-    return oponentGameboard.receiveAttack(randomRow, randomColumn);
+    oponentGameboard.receiveAttack(randomRow, randomColumn);
+    // Returns coordinates so that it can be used to
+    return [randomRow, randomColumn]
   }
   return Object.assign(prototype, { playRandom });
 }
