@@ -19,6 +19,9 @@ function enemySquaresListener(event){
     player1.playTurn(rowCoord, columnCoord);
     // Show hit on webpage
     view.updateBoardAt(model.player2Board, rowCoord, columnCoord);
+    if(model.player2Board.areAllShipsSunk()){
+        console.log('you won')
+    }
 }
 
 function makeEnemySquaresClickable(){

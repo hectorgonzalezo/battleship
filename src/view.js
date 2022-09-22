@@ -3,7 +3,7 @@ import { Ship, Gameboard } from "./gameObjects";
 
 const player1DivBoard = document.querySelector("#player1-board");
 const player2DivBoard = document.querySelector("#player2-board");
-
+const infoDisplay = document.querySelector('header > div')
 
 function createNewBoardElement(board, enemy =false) {
     const fakeBoard = Array(10)

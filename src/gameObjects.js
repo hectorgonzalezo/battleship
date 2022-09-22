@@ -32,7 +32,7 @@ const Ship = function (length) {
 };
 
 const Gameboard = function(playerNumber) {
-    let associatedDiv = document.querySelector(`#player${playerNumber}-board`);
+    const associatedDiv = document.querySelector(`#player${playerNumber}-board`);
   // Keeps track of which ship is where.
   // 10X10 2d array of empty objects
   const boardSquares = Array(10)
