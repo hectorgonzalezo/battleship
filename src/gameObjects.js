@@ -1,3 +1,5 @@
+import getRandomNumber from './getRandomNumber';
+
 const Ship = function (length) {
   // Array full with ones,
   const shipSquares = new Array(length).fill(1);
@@ -103,8 +105,10 @@ const Gameboard = function () {
           const positionObject = boardSquares[rowCoord + i][columnCoord];
           positionObject.ship = ship;
           positionObject.shipSquare = i;
+          positionObject.direction = direction;
         }
       }
+      return ship
     }
   }
 
@@ -131,7 +135,26 @@ const Gameboard = function () {
     return "Ships already sunk";
   }
 
-  return { getCurrentBoard, placeShip, receiveAttack, areAllShipsSunk };
+  // Populates the gameboard with number ships
+  function placeRandomShips(number){
+    const ships = [];
+    // place ships until there are six in board
+    while (ships.length !== number){
+        const randomLength = getRandomNumber(4) + 1;
+        const randomRowCoord = getRandomNumber(9);
+        const randomColumnCoord = getRandomNumber(9);
+        const randomDirection = ['horizontal', 'vertical'][getRandomNumber(2)];
+
+        const ship = placeShip(Ship(randomLength), randomRowCoord, randomColumnCoord, randomDirection);
+        // If ship was succesfully placed, append it to array
+        if(ship !== undefined){
+            ships.push(ship);
+        }
+    }
+    return ships
+  }
+
+  return { getCurrentBoard, placeShip, receiveAttack, areAllShipsSunk, placeRandomShips};
 };
 
 function Player(gameboard, number) {
@@ -147,12 +170,7 @@ function Player(gameboard, number) {
 
 function AIPlayer(gameboard, number) {
   const prototype = Player(gameboard, number);
-
-  function getRandomNumber(max = 9) {
-    // random number from 1-10
-    return Math.floor(Math.random() * max);
-  }
-
+  
   function playRandom() {
     let randomRow = getRandomNumber();
     let randomColumn = getRandomNumber();

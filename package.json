@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "test": "jest",
-    "watchTest": "jest --watch",
+    "testWatch": "jest --watch",
     "build": "webpack --progress --mode=production",
     "babel": "babel src -d babel",
     "watch": "webpack --progress --watch",

@@ -33,4 +33,7 @@ function startBoards() {
 }
 
 PubSub.subscribe("window-loaded", startBoards);
-export { renderNewBoard };
+
+const view = { renderNewBoard };
+
+export default view
