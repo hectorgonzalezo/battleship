@@ -1,67 +1,79 @@
 import PubSub from "pubsub-js";
-import view from "./view"
-import model from './model'
-import { Player } from './gameObjects'
+import view from "./view";
+import model from "./model";
+import { Player } from "./gameObjects";
 
 const popupShips = document.querySelectorAll("#ships .ship");
 const popupBoard = document.querySelector("#pop-up .board");
 
-
 // Player 2 turn
-async function play2(){
-    // play 2
-    view.updateDisplay("Player2 turn");
-    setTimeout(() => {
-      const coords = model.player2.playRandom();
-      if(model.player1Board.areAllShipsSunk()){
-        // If player 2 won stop the game
-        view.updateDisplay('Sorry, you lost!')
-    } else{
-      makeEnemySquaresClickable();
-      view.updateBoardAt(model.player1Board, coords[0], coords[1]);
+async function play2(minWait = 1000, closeTo = null) {
+  // play 2
+  view.updateDisplay("Player2 turn");
+  setTimeout(() => {
+    let coords;
+    let hit;
+    if (Array.isArray(closeTo)) {
+      // If it just scored a hit, play around the same square
+      [coords, hit] = model.player2.playAround(closeTo);
+    } else {
+      // Otherwise, play at random
+      [coords, hit] = model.player2.playRandom();
     }
-    }, (Math.random() * 1000) + 1000);
+    view.updateBoardAt(model.player1Board, coords[0], coords[1]);
+    // Only stop turn after not hitting a target
+    if (hit.ship !== undefined) {
+      // Recursive call
+      play2(minWait * 2, coords);
+    } else if (model.player1Board.areAllShipsSunk()) {
+      // If player 2 won stop the game
+      view.updateDisplay("Sorry, you lost!");
+    } else {
+      // Otherwise, continue gaem
+      makeEnemySquaresClickable();
+    }
+  }, Math.random() * 1000 + minWait);
 }
 
 // Listener allows for player to play turn
-function enemySquaresListener(event){
-    const square = event.target;
-    const rowCoord = square.parentElement.getAttribute('data');
-    const columnCoord = square.getAttribute('data');
-    // Attack selected square
-    model.player1.playTurn(rowCoord, columnCoord);
-    // Show hit on webpage
-    view.updateBoardAt(model.player2Board, rowCoord, columnCoord);
-    if(model.player2Board.areAllShipsSunk()){
-        // If you won
-        view.updateDisplay('You won!')
-    } else if(model.player1Board.areAllShipsSunk()){
-        // If player 2 won
-        view.updateDisplay('Sorry, you lost!')
+function enemySquaresListener(event) {
+  const square = event.target;
+  const rowCoord = square.parentElement.getAttribute("data");
+  const columnCoord = square.getAttribute("data");
+  // Attack selected square
+  const hit = model.player1.playTurn(rowCoord, columnCoord);
+  // Show hit on webpage
+  view.updateBoardAt(model.player2Board, rowCoord, columnCoord);
+  // Stop turn only after you missed a hit
+  if (hit.ship === undefined) {
+    if (model.player2Board.areAllShipsSunk()) {
+      // If you won
+      view.updateDisplay("You won!");
+    } else if (model.player1Board.areAllShipsSunk()) {
+      // If player 2 won
+      view.updateDisplay("Sorry, you lost!");
     } else {
-        // If nobody won, continue playing
-        play2();
+      // If nobody won, continue playing
+      play2();
     }
     makeEnemySquaresUnclickable();
+  }
 }
 
-
-function makeEnemySquaresClickable(){
-    const enemySquares = document.querySelectorAll('.square.enemy');
-    enemySquares.forEach(square => {
-        square.addEventListener('click', enemySquaresListener);
-    });
-    view.updateDisplay('Your turn')
+function makeEnemySquaresClickable() {
+  const enemySquares = document.querySelectorAll(".square.enemy");
+  enemySquares.forEach((square) => {
+    square.addEventListener("click", enemySquaresListener);
+  });
+  view.updateDisplay("Your turn");
 }
 
-function makeEnemySquaresUnclickable(){
-    const enemySquares = document.querySelectorAll('.square.enemy');
-    enemySquares.forEach(square => {
-        square.removeEventListener('click', enemySquaresListener);
-    });
+function makeEnemySquaresUnclickable() {
+  const enemySquares = document.querySelectorAll(".square.enemy");
+  enemySquares.forEach((square) => {
+    square.removeEventListener("click", enemySquaresListener);
+  });
 }
-
-
 
 // Drag and drop event listeners
 popupShips.forEach((ship) => {
@@ -94,6 +106,4 @@ Array.from(popupBoard.children).forEach((row) => {
   });
 });
 
-
-PubSub.subscribe('enemy-loaded', makeEnemySquaresClickable)
-
+PubSub.subscribe("enemy-loaded", makeEnemySquaresClickable);

@@ -93,7 +93,9 @@ describe("Gameboard funcionality", () => {
     newGameboard.placeShip(Ship(5), 0, 0, "horizontal");
     newGameboard.placeShip(Ship(3), 2, 3, "vertical");
 
-    const initialBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
+    const initialBoard = JSON.parse(
+      JSON.stringify(newGameboard.getCurrentBoard())
+    );
 
     // Don't update if ship is to big for available space horizontally
     newGameboard.placeShip(Ship(4), 2, 1, "horizontal");
@@ -101,7 +103,9 @@ describe("Gameboard funcionality", () => {
     expect(newBoard).toEqual(initialBoard);
 
     newGameboard.placeShip(Ship(3), 5, 6, "horizontal");
-    const previousBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
+    const previousBoard = JSON.parse(
+      JSON.stringify(newGameboard.getCurrentBoard())
+    );
     // Don't update if ship is to big for available space vertically
     newGameboard.placeShip(Ship(5), 4, 7, "vertical");
     newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
@@ -119,29 +123,36 @@ describe("Gameboard funcionality", () => {
     newGameboard.placeShip(Ship(1), 0, 0, "horizontal");
     newGameboard.placeShip(Ship(1), 2, 0, "vertical");
 
-    const initialBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
+    const initialBoard = JSON.parse(
+      JSON.stringify(newGameboard.getCurrentBoard())
+    );
 
     newGameboard.placeShip(Ship(3), 3, 1, "vertical");
 
     const newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
     expect(newBoard).toEqual(initialBoard);
-    
   });
 
-  test('Gameboard not updated when ship is placed right on top of another', () => {
+  test("Gameboard not updated when ship is placed right on top of another", () => {
     const newGameboard = Gameboard();
-    newGameboard.placeShip(Ship(3), 7, 0, 'vertical');
-    const previousBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
+    newGameboard.placeShip(Ship(3), 7, 0, "vertical");
+    const previousBoard = JSON.parse(
+      JSON.stringify(newGameboard.getCurrentBoard())
+    );
 
-    newGameboard.placeShip(Ship(2), 9, 0, 'horizontal');
-    const laterBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
+    newGameboard.placeShip(Ship(2), 9, 0, "horizontal");
+    const laterBoard = JSON.parse(
+      JSON.stringify(newGameboard.getCurrentBoard())
+    );
     expect(laterBoard).toEqual(previousBoard);
   });
 
   test("Gameboard not updated when ship is with a typo on direction", () => {
     const newGameboard = Gameboard();
 
-    const initialBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
+    const initialBoard = JSON.parse(
+      JSON.stringify(newGameboard.getCurrentBoard())
+    );
 
     // Don't update if ship is to big for available space horizontally
     newGameboard.placeShip(Ship(3), 2, 2, "horizon");
@@ -251,53 +262,51 @@ describe("Gameboard funcionality", () => {
     expect(newBoard).toEqual(currentBoard);
   });
 
-  test("Gameboard successfully populated with random ships", async () => { 
-    
+  test("Gameboard successfully populated with random ships", async () => {
     const newGameboard = Gameboard();
     const currentBoard = JSON.parse(
-        JSON.stringify(newGameboard.getCurrentBoard())
-      );
+      JSON.stringify(newGameboard.getCurrentBoard())
+    );
 
-      newGameboard.placeRandomShips(6).then(ships => expect(ships.length).toBe(6));
+    newGameboard
+      .placeRandomShips(6)
+      .then((ships) => expect(ships.length).toBe(6));
 
     const newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
     expect(newBoard).not.toEqual(currentBoard);
-  })
+  });
 });
 
+describe("Player functionality", () => {
+  test("Player.playTurn can update Gameboard", () => {
+    const newGameboard = Gameboard();
+    const newPlayer = Player(newGameboard, 1);
+    newGameboard.placeShip(Ship(2), 0, 1);
+    newPlayer.playTurn(8, 1);
 
-describe('Player functionality', () => {
+    // Updates empty squares
+    expect(newGameboard.getCurrentBoard()[8][1].hit).toBe(true);
 
-test("Player.playTurn can update Gameboard", () => {
-  const newGameboard = Gameboard();
-  const newPlayer = Player(newGameboard, 1);
-  newGameboard.placeShip(Ship(2), 0, 1);
-  newPlayer.playTurn(8, 1);
+    // Updates ship squares
+    expect(newPlayer.playTurn(0, 2).shipSquare).toBe(1);
+    expect(newGameboard.getCurrentBoard()[0][2].ship.getSquares()).toEqual([
+      1, 0,
+    ]);
+  });
 
-  // Updates empty squares
-  expect(newGameboard.getCurrentBoard()[8][1].hit).toBe(true);
+  test("AIPlayer.playRandom can update Gameboard", () => {
+    const newGameboard = Gameboard();
+    newGameboard.placeShip(Ship(10), 0, 0);
+    newGameboard.placeShip(Ship(9), 1, 1, "vertical");
+    const newAIPlayer = AIPlayer(newGameboard, 1);
+    const previousBoard = JSON.parse(
+      JSON.stringify(newGameboard.getCurrentBoard())
+    );
+    newAIPlayer.playRandom();
 
-  // Updates ship squares
-  expect(newPlayer.playTurn(0, 2).shipSquare).toBe(1);
-  expect(newGameboard.getCurrentBoard()[0][2].ship.getSquares()).toEqual([
-    1, 0,
-  ]);
-});
-
-test("AIPlayer.playRandom can update Gameboard", () => {
-  const newGameboard = Gameboard();
-  newGameboard.placeShip(Ship(10), 0, 0);
-  newGameboard.placeShip(Ship(9), 1, 1, "vertical");
-  const newAIPlayer = AIPlayer(newGameboard, 1);
-  const previousBoard = JSON.parse(
-    JSON.stringify(newGameboard.getCurrentBoard())
-  );
-  newAIPlayer.playRandom();
-
-  const updatedBoard = JSON.parse(
-    JSON.stringify(newGameboard.getCurrentBoard())
-  );
-  expect(updatedBoard).not.toEqual(previousBoard);
-});
-
+    const updatedBoard = JSON.parse(
+      JSON.stringify(newGameboard.getCurrentBoard())
+    );
+    expect(updatedBoard).not.toEqual(previousBoard);
+  });
 });

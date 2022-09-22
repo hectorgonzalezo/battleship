@@ -1,18 +1,23 @@
-import getRandomNumber from './getRandomNumber';
+import getRandomNumber from "./getRandomNumber";
 
-const hitChecker = (
-    function hitChecker() {
+const hitChecker = (function hitChecker() {
+  // Receives a square from Gameboard and checks if it was previously hit
+  function isAlreadyHit(square) {
+    const isEmptyAndWasHit = square.hit === true;
+    const isShipAndWasHit =
+      square.ship !== undefined &&
+      square.ship.getSquares()[square.shipSquare] === 0;
+    return isEmptyAndWasHit || isShipAndWasHit;
+  }
 
-        function isAlreadyHit(square) {
-            const isEmptyAndWasHit = square.hit === true;
-            const isShipAndWasHit =
-              square.ship !== undefined &&
-              square.ship.getSquares()[square.shipSquare] === 0;
-            return isEmptyAndWasHit || isShipAndWasHit;
-          }
-          return { isAlreadyHit }
-    }
-)()
+  //   receives a coordinate and checks if it is out of bounds
+  function isCoordOutOfBounds(coords) {
+    const isRowOutOfBounds = coords[0] < 0 || coords[0] > 9;
+    const isColumnOutOfBounds = coords[1] < 0 || coords[1] > 9;
+    return isRowOutOfBounds || isColumnOutOfBounds;
+  }
+  return { isAlreadyHit, isCoordOutOfBounds };
+})();
 
 const Ship = function (length) {
   // Array full with ones,
@@ -45,8 +50,8 @@ const Ship = function (length) {
   return { isSunk, getLength, getHit, getSquares };
 };
 
-const Gameboard = function(playerNumber) {
-    const associatedDiv = document.querySelector(`#player${playerNumber}-board`);
+const Gameboard = function (playerNumber) {
+  const associatedDiv = document.querySelector(`#player${playerNumber}-board`);
   // Keeps track of which ship is where.
   // 10X10 2d array of empty objects
   const boardSquares = Array(10)
@@ -57,9 +62,9 @@ const Gameboard = function(playerNumber) {
     return boardSquares;
   };
 
-  const getDiv = function(){
-    return associatedDiv
-  }
+  const getDiv = function () {
+    return associatedDiv;
+  };
 
   function areAllShipsSunk() {
     // Checks if every ship in the board is sunk
@@ -74,15 +79,18 @@ const Gameboard = function(playerNumber) {
   }
 
   // gets only items from row, from start -1 to start + length + 1
-  function getSurroundingSquares(row, start, length){
+  function getSurroundingSquares(row, start, length) {
     const array = [];
-    [-1, 0, 1].forEach(num => {
-        // only get squares inside bounds
-        if((row + num >= 0) && (row + num <= 9)){
-            const currentRow = boardSquares[row + num].slice(Math.max(0, (start - 1)), Math.min(10, (start + length + 1)))
-            array.push(currentRow)
-        }
-    })
+    [-1, 0, 1].forEach((num) => {
+      // only get squares inside bounds
+      if (row + num >= 0 && row + num <= 9) {
+        const currentRow = boardSquares[row + num].slice(
+          Math.max(0, start - 1),
+          Math.min(10, start + length + 1)
+        );
+        array.push(currentRow);
+      }
+    });
     return array.flat();
   }
 
@@ -92,32 +100,40 @@ const Gameboard = function(playerNumber) {
     if (direction === "horizontal") {
       // get row, including surrounding squares
       subArray = getSurroundingSquares(rowCoord, columnCoord, length);
-      offendingSquares = boardSquares[rowCoord].slice(columnCoord, columnCoord + length);
+      offendingSquares = boardSquares[rowCoord].slice(
+        columnCoord,
+        columnCoord + length
+      );
     } else {
       // get only relevant rows
       subArray = boardSquares.filter(
-        (row, i) => i >= Math.max(0, (rowCoord - 1)) && i < Math.min(10, (rowCoord + length + 1))
+        (row, i) =>
+          i >= Math.max(0, rowCoord - 1) &&
+          i < Math.min(10, rowCoord + length + 1)
       );
       offendingSquares = boardSquares.filter(
         (row, i) => i >= rowCoord && i < rowCoord + length
       );
       // get only relevant columns
       subArray = subArray.map((row) =>
-        row.filter((column, i) => i >= Math.max(0, (columnCoord - 1)) || i <= Math.min(9, (columnCoord + 1)))
+        row.filter(
+          (column, i) =>
+            i >= Math.max(0, columnCoord - 1) ||
+            i <= Math.min(9, columnCoord + 1)
+        )
       );
       offendingSquares = offendingSquares.map((row) =>
-      row.filter((column, i) => i === columnCoord)
-    );
+        row.filter((column, i) => i === columnCoord)
+      );
       subArray = subArray.flat();
       offendingSquares = offendingSquares.flat();
     }
 
-    // console.log(subArray)
-
-    const isAnyOccupied = subArray.some((square) => square.hasOwnProperty("ship")
+    const isAnyOccupied = subArray.some((square) =>
+      square.hasOwnProperty("ship")
     );
     const isOutOfBounds = offendingSquares.length !== length;
-    
+
     return isAnyOccupied || isOutOfBounds;
   }
 
@@ -141,7 +157,7 @@ const Gameboard = function(playerNumber) {
           positionObject.direction = direction;
         }
       }
-      return ship
+      return ship;
     }
   }
 
@@ -169,25 +185,37 @@ const Gameboard = function(playerNumber) {
   }
 
   // Populates the gameboard with number ships
-  async function placeRandomShips(number = 1){
+  async function placeRandomShips(number = 1) {
     const ships = [];
     // place ships until there are six in board
-    while (ships.length !== number){
-        const randomLength = getRandomNumber(4) + 1;
-        const randomRowCoord = getRandomNumber(9);
-        const randomColumnCoord = getRandomNumber(9);
-        const randomDirection = ['horizontal', 'vertical'][getRandomNumber(1)];
+    while (ships.length !== number) {
+      const randomLength = getRandomNumber(4) + 1;
+      const randomRowCoord = getRandomNumber(9);
+      const randomColumnCoord = getRandomNumber(9);
+      const randomDirection = ["horizontal", "vertical"][getRandomNumber(1)];
 
-        const ship = placeShip(Ship(randomLength), randomRowCoord, randomColumnCoord, randomDirection);
-        // If ship was succesfully placed, append it to array
-        if(ship !== undefined){
-            ships.push(ship);
-        }
+      const ship = placeShip(
+        Ship(randomLength),
+        randomRowCoord,
+        randomColumnCoord,
+        randomDirection
+      );
+      // If ship was succesfully placed, append it to array
+      if (ship !== undefined) {
+        ships.push(ship);
+      }
     }
-    return Promise.resolve(ships)
+    return Promise.resolve(ships);
   }
 
-  return { getCurrentBoard, getDiv, placeShip, receiveAttack, areAllShipsSunk, placeRandomShips};
+  return {
+    getCurrentBoard,
+    getDiv,
+    placeShip,
+    receiveAttack,
+    areAllShipsSunk,
+    placeRandomShips,
+  };
 };
 
 function Player(oponentGameboard, number) {
@@ -202,28 +230,67 @@ function Player(oponentGameboard, number) {
   return { playTurn, getNumber };
 }
 
-
-
 function AIPlayer(oponentGameboard, number) {
   const prototype = Player(oponentGameboard, number);
 
   function playRandom() {
     let randomRow = getRandomNumber();
     let randomColumn = getRandomNumber();
-    let tentativeLocation = oponentGameboard.getCurrentBoard()[randomRow][randomColumn];
+    let tentativeLocation =
+      oponentGameboard.getCurrentBoard()[randomRow][randomColumn];
 
     // If those coords are occupied choose anothers
-    while(hitChecker.isAlreadyHit(tentativeLocation)){
+    while (hitChecker.isAlreadyHit(tentativeLocation)) {
       randomRow = getRandomNumber();
       randomColumn = getRandomNumber();
-      tentativeLocation = oponentGameboard.getCurrentBoard()[randomRow][randomColumn];
+      tentativeLocation =
+        oponentGameboard.getCurrentBoard()[randomRow][randomColumn];
     }
 
-    oponentGameboard.receiveAttack(randomRow, randomColumn);
+    const hit = oponentGameboard.receiveAttack(randomRow, randomColumn);
     // Returns coordinates so that it can be used to
-    return [randomRow, randomColumn]
+    return [[randomRow, randomColumn], hit];
   }
-  return Object.assign(prototype, { playRandom });
+
+  // If AIPlayer got a hit, continue playing around the same square
+  function playAround(coords) {
+    const randomOffsetRow = getRandomNumber(1) * [1, -1][getRandomNumber(1)];
+    let randomRow = coords[0] + randomOffsetRow;
+    let randomOffsetColumn;
+    let hit;
+
+    // This prevents the AI from choosing a square in a diagonal direction
+    if (randomOffsetRow === 0) {
+      randomOffsetColumn = getRandomNumber(1) * [1, -1][getRandomNumber(1)];
+    } else {
+      randomOffsetColumn = 0;
+    }
+
+    let randomColumn = coords[1] + randomOffsetColumn;
+    let tentativeLocation;
+
+    // Dont look for tentative location if coordinates are out of bounds
+    if (!hitChecker.isCoordOutOfBounds([randomRow, randomColumn])) {
+      tentativeLocation =
+        oponentGameboard.getCurrentBoard()[randomRow][randomColumn];
+    }
+
+    // If those coords are occupied choose anothers by calling recursively
+    if (
+      hitChecker.isCoordOutOfBounds([randomRow, randomColumn]) ||
+      hitChecker.isAlreadyHit(tentativeLocation)
+    ) {
+      [[randomRow, randomColumn], hit] = playAround([randomRow, randomColumn]);
+    } else {
+      // base case
+      // the hit bubbles up the stack
+      hit = oponentGameboard.receiveAttack(randomRow, randomColumn);
+    }
+    // Returns coordinates so that it can be used to
+    return [[randomRow, randomColumn], hit];
+  }
+
+  return Object.assign(prototype, { playRandom, playAround });
 }
 
 export { Ship, Gameboard, Player, AIPlayer };
