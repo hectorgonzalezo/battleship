@@ -1,10 +1,31 @@
 import PubSub from "pubsub-js";
+import view from "./view"
+import model from './model'
+import { Player } from './gameObjects'
 
 const popupShips = document.querySelectorAll("#ships .ship");
 const popupBoard = document.querySelector("#pop-up .board");
 
-function addShip(size, coordRow, coordColumn, direction) {
-  // view.renderShip(size, coordRow, coordColumn)
+
+let enemySquares;
+
+
+function enemySquaresListener(event){
+    const square = event.target;
+    const rowCoord = square.parentElement.getAttribute('data');
+    const columnCoord = square.getAttribute('data');
+    const player1 = model.player1;
+    // Attack selected square
+    player1.playTurn(rowCoord, columnCoord);
+    // Show hit on webpage
+    view.updateBoardAt(model.player2Board, rowCoord, columnCoord);
+}
+
+function makeEnemySquaresClickable(){
+    enemySquares = document.querySelectorAll('.square.enemy');
+    enemySquares.forEach(square => {
+        square.addEventListener('click', enemySquaresListener);
+    });
 }
 
 
@@ -38,3 +59,7 @@ Array.from(popupBoard.children).forEach((row) => {
     square.addEventListener("dragover", (e) => e.preventDefault());
   });
 });
+
+
+PubSub.subscribe('enemy-loaded', makeEnemySquaresClickable)
+

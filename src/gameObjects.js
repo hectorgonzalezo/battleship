@@ -31,7 +31,8 @@ const Ship = function (length) {
   return { isSunk, getLength, getHit, getSquares };
 };
 
-const Gameboard = function (associatedDiv) {
+const Gameboard = function(playerNumber) {
+    let associatedDiv = document.querySelector(`#player${playerNumber}-board`);
   // Keeps track of which ship is where.
   // 10X10 2d array of empty objects
   const boardSquares = Array(10)
@@ -162,7 +163,7 @@ const Gameboard = function (associatedDiv) {
   }
 
   // Populates the gameboard with number ships
-  function placeRandomShips(number = 1){
+  async function placeRandomShips(number = 1){
     const ships = [];
     // place ships until there are six in board
     while (ships.length !== number){
@@ -177,15 +178,15 @@ const Gameboard = function (associatedDiv) {
             ships.push(ship);
         }
     }
-    return ships
+    return Promise.resolve(ships)
   }
 
   return { getCurrentBoard, getDiv, placeShip, receiveAttack, areAllShipsSunk, placeRandomShips};
 };
 
-function Player(gameboard, number) {
+function Player(oponentGameboard, number) {
   function playTurn(rowCoord, columnCoord) {
-    return gameboard.receiveAttack(rowCoord, columnCoord);
+    return oponentGameboard.receiveAttack(rowCoord, columnCoord);
   }
 
   function getNumber() {
@@ -194,14 +195,14 @@ function Player(gameboard, number) {
   return { playTurn, getNumber };
 }
 
-function AIPlayer(gameboard, number) {
-  const prototype = Player(gameboard, number);
+function AIPlayer(oponentGameboard, number) {
+  const prototype = Player(oponentGameboard, number);
   
   function playRandom() {
     let randomRow = getRandomNumber();
     let randomColumn = getRandomNumber();
 
-    const currentBoard = gameboard.getCurrentBoard();
+    const currentBoard = oponentGameboard.getCurrentBoard();
     // If those coords are occupied choose anothers
     while (
       currentBoard[randomRow][randomColumn].hasOwnProperty("hit") ||
@@ -211,7 +212,7 @@ function AIPlayer(gameboard, number) {
       randomColumn = getRandomNumber();
     }
 
-    return gameboard.receiveAttack(randomRow, randomColumn);
+    return oponentGameboard.receiveAttack(randomRow, randomColumn);
   }
   return Object.assign(prototype, { playRandom });
 }

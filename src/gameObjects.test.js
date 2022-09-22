@@ -106,7 +106,7 @@ describe("Gameboard funcionality", () => {
     expect(newBoard).toEqual(previousBoard);
 
     // Don't update if ship is to big for board bounds
-    console.log(newGameboard.placeShip(Ship(3), 9, 2, "vertical"))
+    newGameboard.placeShip(Ship(3), 9, 2, "vertical");
     newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
     expect(newBoard).toEqual(previousBoard);
   });
@@ -248,14 +248,14 @@ describe("Gameboard funcionality", () => {
     expect(newBoard).toEqual(currentBoard);
   });
 
-  test("Gameboard successfully populated with random ships", () => { 
+  test("Gameboard successfully populated with random ships", async () => { 
     
     const newGameboard = Gameboard();
     const currentBoard = JSON.parse(
         JSON.stringify(newGameboard.getCurrentBoard())
       );
 
-    expect(newGameboard.placeRandomShips(6).length).toBe(6);
+      newGameboard.placeRandomShips(6).then(ships => expect(ships.length).toBe(6));
 
     const newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
     expect(newBoard).not.toEqual(currentBoard);
