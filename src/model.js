@@ -1,5 +1,6 @@
 import view from "./view";
-import { Player, AIPlayer, Gameboard } from "./gameObjects";
+import { Player, AIPlayer} from "./gameObjects/players";
+import Gameboard from './gameObjects/gameBoard'
 
 const player1Board = Gameboard(1);
 const player2Board = Gameboard(2);

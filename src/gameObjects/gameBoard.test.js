@@ -2,41 +2,11 @@
  * @jest-environment jsdom
  */
 /* eslint no-undef: 0 */
-import { Ship, Gameboard, Player, AIPlayer } from "./gameObjects";
 
-describe("Ship object functionality", () => {
-  let newShip;
-  beforeAll(() => {
-    newShip = Ship(5);
-  });
+import Gameboard from './gameBoard';
+import { Player, AIPlayer } from './players';
+import Ship from './ship';
 
-  test("Ship object returns false to sunk when created", () => {
-    expect(newShip.isSunk()).toBe(false);
-  });
-
-  test("Ship object outputs correct length", () => {
-    expect(newShip.getLength()).toBe(5);
-    expect(newShip.getLength()).not.toBe(4);
-  });
-
-  test("Ship object capable of getting hit", () => {
-    // Can't hit out of bounds
-    expect(newShip.getHit(-1)).toEqual([1, 1, 1, 1, 1]);
-
-    expect(newShip.getHit(1)).toEqual([1, 0, 1, 1, 1]);
-    expect(newShip.getHit(0)).toEqual([0, 0, 1, 1, 1]);
-
-    // Can't hit twice
-    expect(newShip.getHit(0)).toEqual([0, 0, 1, 1, 1]);
-  });
-
-  test("Ship object capable of being sunk", () => {
-    newShip = Ship(1);
-    expect(newShip.isSunk()).toEqual(false);
-    newShip.getHit(0);
-    expect(newShip.isSunk()).toEqual(true);
-  });
-});
 
 describe("Gameboard funcionality", () => {
   test("Gameboard empty when created", () => {
@@ -335,35 +305,3 @@ describe("Gameboard funcionality", () => {
   });
 });
 
-describe("Player functionality", () => {
-  test("Player.playTurn can update Gameboard", () => {
-    const newGameboard = Gameboard();
-    const newPlayer = Player(newGameboard, 1);
-    newGameboard.placeShip(Ship(2), 0, 1);
-    newPlayer.playTurn(8, 1);
-
-    // Updates empty squares
-    expect(newGameboard.getCurrentBoard()[8][1].hit).toBe(true);
-
-    // Updates ship squares
-    expect(newPlayer.playTurn(0, 2).shipSquare).toBe(1);
-    expect(newGameboard.getCurrentBoard()[0][2].ship.getSquares()).toEqual([
-      1, 0,
-    ]);
-  });
-
-  test("AIPlayer.playRandom can update Gameboard", () => {
-    const newGameboard = Gameboard();
-    newGameboard.placeShip(Ship(1), 1, 1, "vertical");
-    const newAIPlayer = AIPlayer(newGameboard, 1);
-    const previousBoard = JSON.parse(
-      JSON.stringify(newGameboard.getCurrentBoard())
-    );
-    newAIPlayer.playRandom();
-
-    const updatedBoard = JSON.parse(
-      JSON.stringify(newGameboard.getCurrentBoard())
-    );
-    expect(updatedBoard).not.toEqual(previousBoard);
-  });
-});
