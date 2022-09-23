@@ -1,6 +1,5 @@
 import getRandomNumber from "./getRandomNumber";
 import hitChecker from './hitChecker'
-import PubSub from 'pubsub-js';
 import Ship from './ship';
 
 const Gameboard = function (playerNumber) {
@@ -197,17 +196,20 @@ const Gameboard = function (playerNumber) {
   }
 
   // Populates the gameboard with number ships
-  async function placeRandomShips(number = 1) {
+  async function placeRandomShips() {
+    const shipSizes = [5, 4, 3, 2, 2, 1, 1, 1];
+    const shipsNumber = shipSizes.length;
     const ships = [];
     // place ships until there are six in board
-    while (ships.length !== number) {
-      const randomLength = getRandomNumber(4) + 1;
+    while (ships.length !== shipsNumber) {
+        // Iterate through shipSizes array
+      const length = shipSizes[0];
       const randomRowCoord = getRandomNumber(9);
       const randomColumnCoord = getRandomNumber(9);
       const randomDirection = ["horizontal", "vertical"][getRandomNumber(1)];
 
       const ship = placeShip(
-        Ship(randomLength),
+        Ship(length),
         randomRowCoord,
         randomColumnCoord,
         randomDirection
@@ -215,6 +217,7 @@ const Gameboard = function (playerNumber) {
       // If ship was succesfully placed, append it to array
       if (ship !== undefined) {
         ships.push(ship);
+        shipSizes.shift();
       }
     }
     return Promise.resolve(ships);

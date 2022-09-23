@@ -2,6 +2,7 @@ import PubSub from "pubsub-js";
 
 const player1DivBoard = document.querySelector("#player1-board");
 const player2DivBoard = document.querySelector("#player2-board");
+const chooseBoard = document.querySelector('#choose-board');
 const infoDisplay = document.querySelector("header > div");
 
 function createNewBoardElement(board, enemy = false) {
@@ -77,6 +78,8 @@ function startBoards(player1Board, player2Board) {
   createNewBoardElement(player1DivBoard);
   // Adds a special class for enemies, so that you can point and shoot.
   createNewBoardElement(player2DivBoard, true);
+  createNewBoardElement(chooseBoard)
+  
   renderRandomShips(player1Board, player2Board);
 }
 

@@ -3,8 +3,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
 
 :root {
+    --square-size: 43px;
   --board-gap: 2px;
-  --board-size: calc(430px + calc(var(--board-gap) * 10));
+  --board-size: calc(calc(var(--ship-size) * 10) + calc(var(--board-gap) * 10));
   --color-water: rgb(135, 217, 214);
   --color-water-dark: rgb(56, 127, 125);
   --color-background: #27272a;
@@ -85,7 +86,8 @@ main > h1 {
   width: var(--board-size);
   height: var(--board-size);
   background-color: var(--color-background);
-  display: grid;
+  display: flex;
+  flex-direction: column;
   grid-template-rows: repeat(10, 1fr);
   gap: var(--board-gap);
 }
@@ -94,12 +96,13 @@ main > h1 {
   display: flex;
   height: auto;
   gap: var(--board-gap);
+  position: relative;
 }
 
 .square {
   background-color: var(--color-water);
-  width: 100%;
-  height: 100%;
+  width: var(--square-size);
+  height: var(--square-size);
 }
 
 .square.enemy {
@@ -107,7 +110,10 @@ main > h1 {
 }
 .ship-square {
   background-color: blue;
+  min-width: var(--square-size);
+  min-height: var(--square-size);
 }
+
 
 .square.ship-square.hit {
   background-color: green;
@@ -125,9 +131,6 @@ main > h1 {
   background-color: red;
 }
 
-.square:hover {
-  background-color: var(--color-water-dark);
-}
 
 .square.enemy:hover {
   background-color: rgb(227, 134, 134);
@@ -185,9 +188,6 @@ footer {
   grid-area: board;
 }
 
-#ships {
-  grid-area: ships;
-}
 
 #pop-up article {
   background: linear-gradient(
@@ -208,23 +208,37 @@ footer {
 }
 
 #ships {
+    grid-area: ships;
   display: grid;
   align-items: center;
   justify-items: start;
+  position: relative;
 }
 
-#ships .ship {
+#ships .ship.hide {
+    opacity: 0.3;
+    display: none;
+}
+
+
+.ship {
   display: flex;
   gap: var(--board-gap);
+  z-index: 3;
 }
 
-.ship.dragging {
-  opacity: 0.5;
-}
 
 #ships > .multiple-ships {
   display: flex;
   gap: 50px;
+}
+
+.square.drag-over{
+    background-color: yellow;
+}
+
+.square.behind{
+    display:none;
 }
 
 @media only screen and (max-width: 950px) {
