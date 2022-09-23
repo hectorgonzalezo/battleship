@@ -336,12 +336,12 @@ function AIPlayer(oponentGameboard, number) {
         oponentGameboard.getCurrentBoard()[randomRow][randomColumn];
     }
 
-    // If those coords are occupied choose anothers by calling recursively
+    // If those coords are occupied choose another set by calling recursively
     if (
       hitChecker.isCoordOutOfBounds([randomRow, randomColumn]) ||
       hitChecker.isAlreadyHit(tentativeLocation)
     ) {
-      [[randomRow, randomColumn], hit] = playAround([randomRow, randomColumn]);
+      [[randomRow, randomColumn], hit] = playAround(coords);
     } else {
       // base case
       // the hit bubbles up the stack

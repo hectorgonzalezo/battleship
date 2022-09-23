@@ -101,6 +101,10 @@ main > h1 {
   width: 100%;
   height: 100%;
 }
+
+.square.enemy {
+    background-color: #52525b;
+}
 .ship-square {
   background-color: blue;
 }
