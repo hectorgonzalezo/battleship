@@ -5,32 +5,31 @@ import model from "./model";
 const popupShips = document.querySelectorAll("#ships .ship");
 const popupBoard = document.querySelector("#pop-up .board");
 
-
 // Listener functions
 
 function enemySquaresListener(event) {
-    const square = event.target;
-    const rowCoord = square.parentElement.getAttribute("data");
-    const columnCoord = square.getAttribute("data");
-  
-    // Player 1 makes a play
-    play1(rowCoord, columnCoord);
-  }
-  
-  function makeEnemySquaresClickable() {
-    const enemySquares = document.querySelectorAll(".square.enemy");
-    enemySquares.forEach((square) => {
-      square.addEventListener("click", enemySquaresListener);
-    });
-    view.updateDisplay("Your turn");
-  }
-  
-  function makeEnemySquaresUnclickable() {
-    const enemySquares = document.querySelectorAll(".square.enemy");
-    enemySquares.forEach((square) => {
-      square.removeEventListener("click", enemySquaresListener);
-    });
-  }
+  const square = event.target;
+  const rowCoord = square.parentElement.getAttribute("data");
+  const columnCoord = square.getAttribute("data");
+
+  // Player 1 makes a play
+  play1(rowCoord, columnCoord);
+}
+
+function makeEnemySquaresClickable() {
+  const enemySquares = document.querySelectorAll(".square.enemy");
+  enemySquares.forEach((square) => {
+    square.addEventListener("click", enemySquaresListener);
+  });
+  view.updateDisplay("Your turn");
+}
+
+function makeEnemySquaresUnclickable() {
+  const enemySquares = document.querySelectorAll(".square.enemy");
+  enemySquares.forEach((square) => {
+    square.removeEventListener("click", enemySquaresListener);
+  });
+}
 
 // Player 1 turn
 function play1(rowCoord, columnCoord) {
@@ -71,7 +70,6 @@ function play2(minWait = 1000, closeTo = null, sankShip = false) {
     view.updateBoardAt(model.player1Board, coords[0], coords[1]);
     // Only stop turn after not hitting a target
     if (hit.ship !== undefined) {
-
       // Recursive call
       play2(minWait * 2, coords, hit.ship.isSunk());
     } else if (model.player1Board.areAllShipsSunk()) {
@@ -83,8 +81,6 @@ function play2(minWait = 1000, closeTo = null, sankShip = false) {
     }
   }, Math.random() * 1000 + minWait);
 }
-
-
 
 function updateBoardHits(board) {
   const currentBoard = board.getCurrentBoard();
@@ -116,11 +112,6 @@ popupShips.forEach((ship) => {
     e.currentTarget.classList.remove("dragging");
   });
 });
-
-
-
-
-
 
 // Make each square in board dropable
 Array.from(popupBoard.children).forEach((row) => {

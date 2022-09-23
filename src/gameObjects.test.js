@@ -262,7 +262,7 @@ describe("Gameboard funcionality", () => {
     expect(newBoard).toEqual(currentBoard);
   });
 
-  test("Gameboard hits surrounding squares if ship is sunk", () => {
+  test("Gameboard hits surrounding squares if horizontal ship is sunk", () => {
     const newGameboard = Gameboard();
     const newShip = Ship(1);
     newGameboard.placeShip(newShip, 5, 5);
@@ -281,6 +281,43 @@ describe("Gameboard funcionality", () => {
     expect(updatedBoard[6][6].hit).toBe(true);
     expect(updatedBoard[6][4].hit).toBe(true);
     expect(updatedBoard[4][6].hit).toBe(true);
+    // out of bounds should be undefined
+    expect(updatedBoard[4][7].hit).toBe(undefined);
+  });
+
+  test("Gameboard hits surrounding squares if vertical ship is sunk", () => {
+    const newGameboard = Gameboard();
+    const newShip = Ship(3);
+    newGameboard.placeShip(newShip, 5, 5, "vertical");
+    Player(newGameboard, 1).playTurn(5, 5);
+    Player(newGameboard, 1).playTurn(6, 5);
+    Player(newGameboard, 1).playTurn(7, 5);
+
+    const updatedBoard = newGameboard.getCurrentBoard();
+
+    expect(updatedBoard[5][5].ship.isSunk()).toBe(true);
+
+    // Surrounding squares should be hit after ship is sunk
+    expect(updatedBoard[4][4].hit).toBe(true);
+    expect(updatedBoard[4][5].hit).toBe(true);
+    expect(updatedBoard[4][6].hit).toBe(true);
+    expect(updatedBoard[5][4].hit).toBe(true);
+    expect(updatedBoard[5][6].hit).toBe(true);
+    expect(updatedBoard[6][6].hit).toBe(true);
+    expect(updatedBoard[6][4].hit).toBe(true);
+    expect(updatedBoard[7][4].hit).toBe(true);
+    expect(updatedBoard[7][6].hit).toBe(true);
+    expect(updatedBoard[8][4].hit).toBe(true);
+    expect(updatedBoard[8][5].hit).toBe(true);
+    expect(updatedBoard[8][6].hit).toBe(true);
+
+    // surrounding squares should be undefinded
+    expect(updatedBoard[4][3].hit).toBe(undefined);
+    expect(updatedBoard[4][7].hit).toBe(undefined);
+    expect(updatedBoard[5][3].hit).toBe(undefined);
+    expect(updatedBoard[3][3].hit).toBe(undefined);
+    expect(updatedBoard[3][4].hit).toBe(undefined);
+    expect(updatedBoard[8][8].hit).toBe(undefined);
   });
 
   test("Gameboard successfully populated with random ships", async () => {

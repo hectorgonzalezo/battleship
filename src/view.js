@@ -84,7 +84,7 @@ const view = {
   startBoards,
   renderShips,
   updateBoardAt,
-  updateDisplay
+  updateDisplay,
 };
 
 export default view;

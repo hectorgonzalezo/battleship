@@ -125,12 +125,15 @@ const Gameboard = function (playerNumber) {
     subArray = subArray.map((row) =>
       row.filter(
         (column, i) =>
-          i >= Math.max(0, columnCoord - 1) || i <= Math.min(9, columnCoord + 1)
+          i >= Math.max(0, columnCoord - 1) && i <= Math.min(9, columnCoord + 1)
       )
     );
+
     offendingSquares = offendingSquares.map((row) =>
       row.filter((column, i) => i === columnCoord)
     );
+
+    console.log(subArray);
     subArray = subArray.flat();
     offendingSquares = offendingSquares.flat();
 
@@ -157,11 +160,13 @@ const Gameboard = function (playerNumber) {
       }
 
       surroundingSquares = surroundingSquares.filter(
-        (square) => square.ship === undefined
+        (surroundingSquare) => surroundingSquare.ship === undefined
       );
 
       // Sink every square that is not a ship
-      surroundingSquares.forEach((square) => (square.hit = true));
+      surroundingSquares.forEach(
+        (surroundingSquare) => (surroundingSquare.hit = true)
+      );
       PubSub.publish("surrounding-squares-sunk");
     }
   }
