@@ -262,6 +262,27 @@ describe("Gameboard funcionality", () => {
     expect(newBoard).toEqual(currentBoard);
   });
 
+  test("Gameboard hits surrounding squares if ship is sunk", () => {
+    const newGameboard = Gameboard();
+    const newShip = Ship(1);
+    newGameboard.placeShip(newShip, 5, 5);
+    Player(newGameboard, 1).playTurn(5, 5);
+
+    const updatedBoard = newGameboard.getCurrentBoard();
+
+    expect(updatedBoard[5][5].ship.isSunk()).toBe(true);
+
+    // Surrounding squares should be hit after ship is sunk
+    expect(updatedBoard[4][5].hit).toBe(true);
+    expect(updatedBoard[6][5].hit).toBe(true);
+    expect(updatedBoard[5][4].hit).toBe(true);
+    expect(updatedBoard[5][6].hit).toBe(true);
+    expect(updatedBoard[4][4].hit).toBe(true);
+    expect(updatedBoard[6][6].hit).toBe(true);
+    expect(updatedBoard[6][4].hit).toBe(true);
+    expect(updatedBoard[4][6].hit).toBe(true);
+  });
+
   test("Gameboard successfully populated with random ships", async () => {
     const newGameboard = Gameboard();
     const currentBoard = JSON.parse(
@@ -296,8 +317,7 @@ describe("Player functionality", () => {
 
   test("AIPlayer.playRandom can update Gameboard", () => {
     const newGameboard = Gameboard();
-    newGameboard.placeShip(Ship(10), 0, 0);
-    newGameboard.placeShip(Ship(9), 1, 1, "vertical");
+    newGameboard.placeShip(Ship(1), 1, 1, "vertical");
     const newAIPlayer = AIPlayer(newGameboard, 1);
     const previousBoard = JSON.parse(
       JSON.stringify(newGameboard.getCurrentBoard())

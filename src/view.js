@@ -50,8 +50,7 @@ function removePreviousHit() {
   }
 }
 
-function updateBoardAt(board, rowCoord, columnCoord) {
-  const currentBoard = board.getCurrentBoard();
+function updateBoardAt(board, rowCoord, columnCoord, updatingHits = false) {
   const div = board.getDiv();
   // Access corresponding square in DivBoard and change its color
   const shipSquare = div.children[rowCoord].children[columnCoord];
@@ -59,7 +58,9 @@ function updateBoardAt(board, rowCoord, columnCoord) {
   // remove just-hit from previous div. This allows the page to
   // highligh only the latest hit
   removePreviousHit();
-  shipSquare.classList.add("just-hit");
+  if (!updatingHits) {
+    shipSquare.classList.add("just-hit");
+  }
 }
 
 function updateDisplay(string) {
@@ -79,6 +80,12 @@ function startBoards(player1Board, player2Board) {
   renderRandomShips(player1Board, player2Board);
 }
 
-const view = { startBoards, renderShips, updateBoardAt, updateDisplay };
+const view = {
+  startBoards,
+  renderShips,
+  updateBoardAt,
+  updateDisplay,
+  updateBothBoardsHits,
+};
 
 export default view;

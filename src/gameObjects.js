@@ -1,4 +1,5 @@
 import getRandomNumber from "./getRandomNumber";
+import PubSub from "pubsub-js";
 
 const hitChecker = (function hitChecker() {
   // Receives a square from Gameboard and checks if it was previously hit
@@ -78,20 +79,91 @@ const Gameboard = function (playerNumber) {
     );
   }
 
+  function calculateShipStart(square, rowCoord, columnCoord) {
+    const currentIndex = square.shipSquare;
+    if (square.direction === "horizontal") {
+      return [rowCoord, columnCoord - currentIndex];
+    }
+    return [rowCoord - currentIndex, columnCoord];
+  }
+
   // gets only items from row, from start -1 to start + length + 1
-  function getSurroundingSquares(row, start, length) {
+  function getSurroundingSquaresHorizontal(rowCoord, columnCoord, length) {
     const array = [];
     [-1, 0, 1].forEach((num) => {
       // only get squares inside bounds
-      if (row + num >= 0 && row + num <= 9) {
-        const currentRow = boardSquares[row + num].slice(
-          Math.max(0, start - 1),
-          Math.min(10, start + length + 1)
+      if (rowCoord + num >= 0 && rowCoord + num <= 9) {
+        const currentRow = boardSquares[rowCoord + num].slice(
+          Math.max(0, columnCoord - 1),
+          Math.min(10, columnCoord + length + 1)
         );
         array.push(currentRow);
       }
     });
-    return array.flat();
+
+    const offendingSquares = boardSquares[rowCoord].slice(
+      columnCoord,
+      columnCoord + length
+    );
+
+    return [array.flat(), offendingSquares];
+  }
+
+  function getSurroundingSquaresVertical(rowCoord, columnCoord, length) {
+    let subArray;
+    let offendingSquares;
+    // get only relevant rows
+    subArray = boardSquares.filter(
+      (row, i) =>
+        i >= Math.max(0, rowCoord - 1) &&
+        i < Math.min(10, rowCoord + length + 1)
+    );
+    offendingSquares = boardSquares.filter(
+      (row, i) => i >= rowCoord && i < rowCoord + length
+    );
+    // get only relevant columns
+    subArray = subArray.map((row) =>
+      row.filter(
+        (column, i) =>
+          i >= Math.max(0, columnCoord - 1) || i <= Math.min(9, columnCoord + 1)
+      )
+    );
+    offendingSquares = offendingSquares.map((row) =>
+      row.filter((column, i) => i === columnCoord)
+    );
+    subArray = subArray.flat();
+    offendingSquares = offendingSquares.flat();
+
+    return [subArray, offendingSquares];
+  }
+
+  function updateSurroundingSquaresIfSunk(square, rowCoord, columnCoord) {
+    if (square.ship.isSunk()) {
+      const start = calculateShipStart(square, rowCoord, columnCoord);
+      const length = square.ship.getLength();
+      let surroundingSquares;
+      if (square.direction === "horizontal") {
+        [surroundingSquares] = getSurroundingSquaresHorizontal(
+          start[0],
+          start[1],
+          length
+        );
+      } else {
+        [surroundingSquares] = getSurroundingSquaresVertical(
+          start[0],
+          start[1],
+          length
+        );
+      }
+
+      surroundingSquares = surroundingSquares.filter(
+        (square) => square.ship === undefined
+      );
+
+      // Sink every square that is not a ship
+      surroundingSquares.forEach((square) => (square.hit = true));
+      PubSub.publish("surrounding-squares-sunk");
+    }
   }
 
   function isBlocked(length, rowCoord, columnCoord, direction) {
@@ -99,36 +171,18 @@ const Gameboard = function (playerNumber) {
     let offendingSquares;
     if (direction === "horizontal") {
       // get row, including surrounding squares
-      subArray = getSurroundingSquares(rowCoord, columnCoord, length);
-      offendingSquares = boardSquares[rowCoord].slice(
+      [subArray, offendingSquares] = getSurroundingSquaresHorizontal(
+        rowCoord,
         columnCoord,
-        columnCoord + length
+        length
       );
     } else {
-      // get only relevant rows
-      subArray = boardSquares.filter(
-        (row, i) =>
-          i >= Math.max(0, rowCoord - 1) &&
-          i < Math.min(10, rowCoord + length + 1)
+      [subArray, offendingSquares] = getSurroundingSquaresVertical(
+        rowCoord,
+        columnCoord,
+        length
       );
-      offendingSquares = boardSquares.filter(
-        (row, i) => i >= rowCoord && i < rowCoord + length
-      );
-      // get only relevant columns
-      subArray = subArray.map((row) =>
-        row.filter(
-          (column, i) =>
-            i >= Math.max(0, columnCoord - 1) ||
-            i <= Math.min(9, columnCoord + 1)
-        )
-      );
-      offendingSquares = offendingSquares.map((row) =>
-        row.filter((column, i) => i === columnCoord)
-      );
-      subArray = subArray.flat();
-      offendingSquares = offendingSquares.flat();
     }
-
     const isAnyOccupied = subArray.some((square) =>
       square.hasOwnProperty("ship")
     );
@@ -147,6 +201,7 @@ const Gameboard = function (playerNumber) {
           const positionObject = boardSquares[rowCoord][i + columnCoord];
           positionObject.ship = ship;
           positionObject.shipSquare = i;
+          positionObject.direction = direction;
         }
       } else if (direction === "vertical") {
         // if direction is vertical
@@ -167,10 +222,11 @@ const Gameboard = function (playerNumber) {
       if (hitChecker.isAlreadyHit(chosenSquare)) {
         return "Cant hit the same spot twice";
       }
-      // If square is ocuppied, send hit to corresponding ship
+      // If square is occupied, send hit to corresponding ship
       if (chosenSquare.hasOwnProperty("ship")) {
-        // If ship was allready hit
         chosenSquare.ship.getHit(chosenSquare.shipSquare);
+        // hit surrounding squares if ship is sunk
+        updateSurroundingSquaresIfSunk(chosenSquare, rowCoord, columnCoord);
       } else {
         // If its empty, update the board
         chosenSquare.hit = true;
@@ -221,7 +277,12 @@ const Gameboard = function (playerNumber) {
 function Player(oponentGameboard, number) {
   function playTurn(rowCoord, columnCoord) {
     // Returns ship being hit
-    return oponentGameboard.receiveAttack(rowCoord, columnCoord);
+    // Coordinates are extracted by controller from DOM, so they have to be
+    // converted into integers
+    return oponentGameboard.receiveAttack(
+      Number(rowCoord),
+      Number(columnCoord)
+    );
   }
 
   function getNumber() {

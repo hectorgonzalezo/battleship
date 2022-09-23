@@ -6,8 +6,30 @@ import { Player } from "./gameObjects";
 const popupShips = document.querySelectorAll("#ships .ship");
 const popupBoard = document.querySelector("#pop-up .board");
 
+// Player 1 turn
+function play1(rowCoord, columnCoord) {
+  // Attack selected square
+  const hit = model.player1.playTurn(rowCoord, columnCoord);
+  // Show hit on webpage
+  view.updateBoardAt(model.player2Board, rowCoord, columnCoord);
+  // Stop turn only after you missed a hit
+  if (hit.ship === undefined) {
+    if (model.player2Board.areAllShipsSunk()) {
+      // If you won
+      view.updateDisplay("You won!");
+    } else if (model.player1Board.areAllShipsSunk()) {
+      // If player 2 won
+      view.updateDisplay("Sorry, you lost!");
+    } else {
+      // If nobody won, continue playing
+      play2();
+    }
+    makeEnemySquaresUnclickable();
+  }
+}
+
 // Player 2 turn
-async function play2(minWait = 1000, closeTo = null) {
+function play2(minWait = 1000, closeTo = null) {
   // play 2
   view.updateDisplay("Player2 turn");
   setTimeout(() => {
@@ -29,35 +51,19 @@ async function play2(minWait = 1000, closeTo = null) {
       // If player 2 won stop the game
       view.updateDisplay("Sorry, you lost!");
     } else {
-      // Otherwise, continue gaem
+      // Otherwise, continue game
       makeEnemySquaresClickable();
     }
   }, Math.random() * 1000 + minWait);
 }
 
-// Listener allows for player to play turn
 function enemySquaresListener(event) {
   const square = event.target;
   const rowCoord = square.parentElement.getAttribute("data");
   const columnCoord = square.getAttribute("data");
-  // Attack selected square
-  const hit = model.player1.playTurn(rowCoord, columnCoord);
-  // Show hit on webpage
-  view.updateBoardAt(model.player2Board, rowCoord, columnCoord);
-  // Stop turn only after you missed a hit
-  if (hit.ship === undefined) {
-    if (model.player2Board.areAllShipsSunk()) {
-      // If you won
-      view.updateDisplay("You won!");
-    } else if (model.player1Board.areAllShipsSunk()) {
-      // If player 2 won
-      view.updateDisplay("Sorry, you lost!");
-    } else {
-      // If nobody won, continue playing
-      play2();
-    }
-    makeEnemySquaresUnclickable();
-  }
+
+  // Player 1 makes a play
+  play1(rowCoord, columnCoord);
 }
 
 function makeEnemySquaresClickable() {
@@ -73,6 +79,24 @@ function makeEnemySquaresUnclickable() {
   enemySquares.forEach((square) => {
     square.removeEventListener("click", enemySquaresListener);
   });
+}
+
+function updateBoardHits(board) {
+  const currentBoard = board.getCurrentBoard();
+  currentBoard.forEach((row, i) => {
+    row.forEach((square, j) => {
+      if (square.hit === true) {
+        console.log(board);
+        view.updateBoardAt(board, i, j, true);
+      }
+    });
+  });
+}
+
+function updateBothBoardsHits() {
+  console.log(model.player1Board);
+  updateBoardHits(model.player1Board);
+  updateBoardHits(model.player2Board);
 }
 
 // Drag and drop event listeners
@@ -107,3 +131,4 @@ Array.from(popupBoard.children).forEach((row) => {
 });
 
 PubSub.subscribe("enemy-loaded", makeEnemySquaresClickable);
+PubSub.subscribe("surrounding-squares-sunk", updateBothBoardsHits);
