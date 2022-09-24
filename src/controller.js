@@ -2,7 +2,6 @@ import PubSub from "pubsub-js";
 import view from "./view";
 import model from "./model";
 
-
 // Listener functions
 
 function enemySquaresListener(event) {

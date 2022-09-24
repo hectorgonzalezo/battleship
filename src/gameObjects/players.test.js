@@ -2,9 +2,9 @@
  * @jest-environment jsdom
  */
 /* eslint no-undef: 0 */
-import { Player, AIPlayer } from './players';
-import Gameboard from './gameboard';
-import Ship from './ship';
+import { Player, AIPlayer } from "./players";
+import Gameboard from "./gameboard";
+import Ship from "./ship";
 
 describe("Player functionality", () => {
   test("Player.playTurn can update Gameboard", () => {

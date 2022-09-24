@@ -1,5 +1,5 @@
-import hitChecker from './hitChecker';
-import getRandomNumber from './getRandomNumber';
+import hitChecker from "./hitChecker";
+import getRandomNumber from "./getRandomNumber";
 
 function Player(oponentGameboard, number) {
   function playTurn(rowCoord, columnCoord) {
@@ -82,4 +82,3 @@ function AIPlayer(oponentGameboard, number) {
 }
 
 export { Player, AIPlayer };
-

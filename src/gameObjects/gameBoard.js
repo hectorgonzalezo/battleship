@@ -1,6 +1,6 @@
 import getRandomNumber from "./getRandomNumber";
-import hitChecker from './hitChecker'
-import Ship from './ship';
+import hitChecker from "./hitChecker";
+import Ship from "./ship";
 
 const Gameboard = function (playerNumber) {
   const associatedDiv = document.querySelector(`#player${playerNumber}-board`);
@@ -202,7 +202,7 @@ const Gameboard = function (playerNumber) {
     const ships = [];
     // place ships until there are six in board
     while (ships.length !== shipsNumber) {
-        // Iterate through shipSizes array
+      // Iterate through shipSizes array
       const length = shipSizes[0];
       const randomRowCoord = getRandomNumber(9);
       const randomColumnCoord = getRandomNumber(9);
@@ -233,4 +233,4 @@ const Gameboard = function (playerNumber) {
   };
 };
 
-export default Gameboard
+export default Gameboard;

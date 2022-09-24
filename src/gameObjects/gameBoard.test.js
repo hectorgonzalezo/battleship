@@ -3,10 +3,9 @@
  */
 /* eslint no-undef: 0 */
 
-import Gameboard from './gameBoard';
-import { Player, AIPlayer } from './players';
-import Ship from './ship';
-
+import Gameboard from "./gameBoard";
+import { Player, AIPlayer } from "./players";
+import Ship from "./ship";
 
 describe("Gameboard funcionality", () => {
   test("Gameboard empty when created", () => {
@@ -304,4 +303,3 @@ describe("Gameboard funcionality", () => {
     expect(newBoard).not.toEqual(currentBoard);
   });
 });
-

@@ -1,4 +1,3 @@
-
 const Ship = function (length) {
   // Array full with ones,
   const shipSquares = new Array(length).fill(1);
@@ -28,6 +27,6 @@ const Ship = function (length) {
   };
 
   return { isSunk, getLength, getHit, getSquares };
-}
+};
 
-export default Ship
+export default Ship;

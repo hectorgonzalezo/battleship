@@ -7,6 +7,85 @@ const buttonStart = document.querySelector("#start");
 // be updated when moving it.
 const squaresBehind = {};
 
+function getSquareAtIndex(number, row) {
+  let squares = Array.from(row.children);
+  squares = squares.filter(
+    (square) => Number(square.getAttribute("data")) === number
+  );
+  return squares;
+}
+
+function allowVerticalRotation(e) {
+  e.target.parentElement.classList.toggle("vertical");
+}
+
+function hideRelevantSquares(ship, rowCoord, columnCoord, shipLength) {
+  // Show previously hidden squares
+  if (squaresBehind[ship.id] !== undefined) {
+    squaresBehind[ship.id].forEach((squareBehind) =>
+      squareBehind.classList.remove("behind")
+    );
+  }
+  const board = document.querySelector("#pop-up .board");
+  let relevantSquares;
+
+  if (!ship.classList.contains("vertical")) {
+    // Horizontal position
+    let siblings = Array.from(Array.from(board.children)[rowCoord].children);
+    siblings = siblings.filter((sibling) => sibling.id !== ship.id);
+
+    // Get selected squares
+    relevantSquares = siblings.slice(columnCoord, columnCoord + shipLength);
+    ship.style.position = "";
+
+    relevantSquares.forEach((relevantSquare) =>
+      relevantSquare.classList.add("behind")
+    );
+  } else {
+    // Vertical position
+    // Hide new relevant squares
+    const relevantRows = Array.from(board.children).slice(
+      rowCoord,
+      rowCoord + shipLength
+    );
+    relevantSquares = relevantRows.map((row) =>
+      getSquareAtIndex(columnCoord, row)
+    );
+    relevantSquares = relevantSquares.flat();
+
+    // make ship position relative
+    const squareSizes = Number(
+      getComputedStyle(ship)
+        .getPropertyValue("--square-size")
+        .match(/\d/g)
+        .join("")
+    );
+    const gapSize = Number(
+      getComputedStyle(ship)
+        .getPropertyValue("--board-gap")
+        .match(/\d/g)
+        .join("")
+    );
+    ship.style.position = "absolute";
+    ship.style.left = `${(squareSizes + gapSize) * columnCoord}px`;
+  }
+  squaresBehind[ship.id] = relevantSquares;
+
+  return relevantSquares;
+}
+
+// This function is used by the ship event listener
+function allowVerticalRotationOnBoard(e) {
+  const ship = e.target.parentElement;
+  const rowCoord = Number(ship.getAttribute("coordrow"));
+  const columnCoord = Number(ship.getAttribute("coordcolumn"));
+  const shipLength = Number(ship.getAttribute("data"));
+
+  ship.classList.toggle("vertical");
+  // Reveal previously hidden squares, and hide new ones
+  hideRelevantSquares(ship, rowCoord, columnCoord, shipLength);
+}
+
 popupShips.forEach((ship) => {
   ship.addEventListener("dragstart", (e) => {
     // e.dataTransfer.clearData();
@@ -23,11 +102,15 @@ popupShips.forEach((ship) => {
       e.target.classList.remove("hide");
     }, 0);
   });
+
+  // Rotate on double click
+  ship.addEventListener("dblclick", allowVerticalRotation);
 });
 
 // Make each square in board droppable
 Array.from(popupBoard.children).forEach((row) => {
   Array.from(row.children).forEach((square) => {
+    const rowNumber = Number(row.getAttribute("data"));
     square.addEventListener("drop", (e) => {
       e.preventDefault();
       const id = e.dataTransfer.getData("text/plain");
@@ -37,32 +120,21 @@ Array.from(popupBoard.children).forEach((row) => {
       e.target.classList.remove("drag-over");
       const squareNumber = Number(square.getAttribute("data"));
 
+      // So it can be rotated
+      draggedShip.classList.add("dragged-in");
+      draggedShip.removeEventListener("dblclick", allowVerticalRotation);
+      // Changes vertical rotation behavior when inside the board
+      draggedShip.addEventListener("dblclick", allowVerticalRotationOnBoard);
+
+      // Add coordinates to object
+      draggedShip.setAttribute("coordColumn", squareNumber);
+      draggedShip.setAttribute("coordRow", row.getAttribute("data"));
+
       // If there's enough space in grid
       if (squareNumber + shipSize <= 10) {
-        // Updates squares behind when moving it withing board
-        if (squaresBehind[id] !== undefined) {
-          squaresBehind[id].forEach((squareBehind) =>
-            squareBehind.classList.remove("behind")
-          );
-        }
-
-        // Prevent squares from overflowing if selecting the first one
-        let siblings = Array.from(square.parentElement.children)
-        siblings = siblings.filter(sibling => sibling.id !== id);
-
-        // Get selected squares
-        const relevantSquares = siblings.slice(
-          squareNumber,
-          squareNumber + shipSize
-        );
-
-        relevantSquares.forEach((shipSquare) => {
-          shipSquare.classList.add("behind");
-        });
-        squaresBehind[id] = relevantSquares;
-
+        hideRelevantSquares(draggedShip, rowNumber, squareNumber, shipSize);
         // Append the ship
-        row.insertBefore(draggedShip, square.nextSibling)
+        row.insertBefore(draggedShip, square.nextSibling);
       }
     });
 

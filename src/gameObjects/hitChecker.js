@@ -17,4 +17,4 @@ const hitChecker = (function hitChecker() {
   return { isAlreadyHit, isCoordOutOfBounds };
 })();
 
-export default hitChecker
+export default hitChecker;
