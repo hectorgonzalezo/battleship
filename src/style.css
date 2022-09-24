@@ -40,9 +40,10 @@ body {
   align-items: center;
 }
 
-.inactive {
+body .inactive {
+  display: none;
   position: absolute;
-  right: -100%;
+  left: -100%;
 }
 
 header {
@@ -172,9 +173,6 @@ footer {
     "board ships";
 }
 
-#pop-up.inactive {
-  left: -100%;
-}
 #pop-up article {
   grid-area: title;
 }
@@ -213,12 +211,13 @@ footer {
 
 #ships {
   grid-area: ships;
-  height: auto;
-  display: flex;
-  gap: 30px;
+  display: grid;
+  gap: 10px;
   flex-wrap: wrap;
-  align-items: start;
   position: relative;
+  max-width: var(--board-size);
+  padding: 30px;
+  justify-self: start;
 }
 
 #ships .ship.hide {
