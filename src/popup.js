@@ -29,8 +29,9 @@ function hideRelevantSquares(ship, rowCoord, columnCoord, shipLength) {
   const board = document.querySelector("#pop-up .board");
   let relevantSquares;
 
-  if (!ship.classList.contains("vertical")) {
-    // Horizontal position
+  if (!ship.classList.contains("vertical")){
+    if(columnCoord + shipLength <= 10){
+    // Horizontal position, if it fits
     let siblings = Array.from(Array.from(board.children)[rowCoord].children);
     siblings = siblings.filter((sibling) => sibling.id !== ship.id);
 
@@ -41,8 +42,9 @@ function hideRelevantSquares(ship, rowCoord, columnCoord, shipLength) {
     relevantSquares.forEach((relevantSquare) =>
       relevantSquare.classList.add("behind")
     );
-  } else {
-    // Vertical position
+    }
+  } else if (rowCoord + shipLength <= 10) {
+    // Vertical position, only if it fits
     // Hide new relevant squares
     const relevantRows = Array.from(board.children).slice(
       rowCoord,
@@ -53,7 +55,7 @@ function hideRelevantSquares(ship, rowCoord, columnCoord, shipLength) {
     );
     relevantSquares = relevantSquares.flat();
 
-    // make ship position relative
+    // make ship position absolute
     const squareSizes = Number(
       getComputedStyle(ship)
         .getPropertyValue("--square-size")
@@ -68,7 +70,8 @@ function hideRelevantSquares(ship, rowCoord, columnCoord, shipLength) {
     );
     ship.style.position = "absolute";
     ship.style.left = `${(squareSizes + gapSize) * columnCoord}px`;
-  }
+    }
+
   squaresBehind[ship.id] = relevantSquares;
 
   return relevantSquares;
@@ -130,12 +133,12 @@ Array.from(popupBoard.children).forEach((row) => {
       draggedShip.setAttribute("coordColumn", squareNumber);
       draggedShip.setAttribute("coordRow", row.getAttribute("data"));
 
-      // If there's enough space in grid
-      if (squareNumber + shipSize <= 10) {
-        hideRelevantSquares(draggedShip, rowNumber, squareNumber, shipSize);
-        // Append the ship
-        row.insertBefore(draggedShip, square.nextSibling);
-      }
+      
+        const relevantSquares = hideRelevantSquares(draggedShip, rowNumber, squareNumber, shipSize);
+        // If there's enough space in grid, append the ship
+        if(relevantSquares !== undefined) {
+            row.insertBefore(draggedShip, square.nextSibling);
+        }
     });
 
     // When entering square
