@@ -296,8 +296,8 @@ describe("Gameboard funcionality", () => {
     );
 
     newGameboard
-      .placeRandomShips(6)
-      .then((ships) => expect(ships.length).toBe(6));
+      .placeRandomShips()
+      .then((ships) => expect(ships.length).toBe(8));
 
     const newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
     expect(newBoard).not.toEqual(currentBoard);
