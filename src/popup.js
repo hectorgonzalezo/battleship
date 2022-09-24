@@ -6,6 +6,7 @@ const buttonStart = document.querySelector("#start");
 // This object stores the squares that lay behind each ship, so that they can
 // be updated when moving it.
 const squaresBehind = {};
+const squaresSurrounding = {};
 
 function getSquareAtIndex(number, row) {
   let squares = Array.from(row.children);
@@ -19,6 +20,44 @@ function allowVerticalRotation(e) {
   e.target.parentElement.classList.toggle("vertical");
 }
 
+// This prevents the user from placing ships besides without at least 1 space between them
+function getSurroundingSquaresHorizontal(
+  siblings,
+  rowCoord,
+  columnCoord,
+  shipLength
+) {
+  // only horizontal for now
+  const board = document.querySelector("#pop-up .board");
+  const iSquareBefore = Math.max(columnCoord - 1, 0);
+  const iSquareAfter = Math.min(columnCoord + shipLength, 9);
+  const iRowBefore = Math.max(rowCoord - 1, 0);
+  const iRowAfter = Math.min(rowCoord + 1, 9);
+  let rowBefore = Array.from(Array.from(board.children)[iRowBefore].children);
+  rowBefore = rowBefore.filter((square) => !square.classList.contains("ship"));
+  let rowAfter = Array.from(Array.from(board.children)[iRowAfter].children);
+  rowAfter = rowAfter.filter((square) => !square.classList.contains("ship"));
+
+  let surroundingSquares = [siblings[iSquareBefore], siblings[iSquareAfter]];
+  const upperSquares = rowBefore.slice(iSquareBefore, iSquareAfter + 1);
+  const lowerSquares = rowAfter.slice(iSquareBefore, iSquareAfter + 1);
+
+  surroundingSquares = surroundingSquares.concat(upperSquares);
+  surroundingSquares = surroundingSquares.concat(lowerSquares);
+
+  return surroundingSquares;
+}
+
+// Prevents hits from being removed when moving a ship, from the vicinity of another
+function reAddHits() {
+  const allHits = Object.values(squaresSurrounding);
+  allHits.forEach((hits) => {
+    if (Array.isArray(hits)) {
+      hits.forEach((hit) => hit.classList.add("hit"));
+    }
+  });
+}
+
 function hideRelevantSquares(ship, rowCoord, columnCoord, shipLength) {
   // Show previously hidden squares
   if (squaresBehind[ship.id] !== undefined) {
@@ -26,22 +65,48 @@ function hideRelevantSquares(ship, rowCoord, columnCoord, shipLength) {
       squareBehind.classList.remove("behind")
     );
   }
+
+  // Remove hit from previous surrounding squares
+  if (squaresSurrounding[ship.id] !== undefined) {
+    squaresSurrounding[ship.id].forEach((squareSurrounding) => {
+      squareSurrounding.classList.remove("hit");
+      // Re add hit if it belongs to another ship
+    });
+    squaresSurrounding[ship.id] = {};
+    reAddHits();
+  }
+
+  // remove hit from previous squares
   const board = document.querySelector("#pop-up .board");
   let relevantSquares;
+  let surroundingSquares;
 
-  if (!ship.classList.contains("vertical")){
-    if(columnCoord + shipLength <= 10){
-    // Horizontal position, if it fits
-    let siblings = Array.from(Array.from(board.children)[rowCoord].children);
-    siblings = siblings.filter((sibling) => sibling.id !== ship.id);
+  if (!ship.classList.contains("vertical")) {
+    if (columnCoord + shipLength <= 10) {
+      // Horizontal position, if it fits
+      let siblings = Array.from(Array.from(board.children)[rowCoord].children);
+      siblings = siblings.filter((sibling) => sibling.id !== ship.id);
 
-    // Get selected squares
-    relevantSquares = siblings.slice(columnCoord, columnCoord + shipLength);
-    ship.style.position = "";
+      // Get selected squares
+      relevantSquares = siblings.slice(columnCoord, columnCoord + shipLength);
 
-    relevantSquares.forEach((relevantSquare) =>
-      relevantSquare.classList.add("behind")
-    );
+      // Get surrounding squares do add hit
+      surroundingSquares = getSurroundingSquaresHorizontal(
+        siblings,
+        rowCoord,
+        columnCoord,
+        shipLength
+      );
+      surroundingSquares.forEach((surroundingSquare) =>
+        surroundingSquare.classList.add("hit")
+      );
+
+      // Keep ship in position
+      ship.style.position = "";
+
+      relevantSquares.forEach((relevantSquare) =>
+        relevantSquare.classList.add("behind")
+      );
     }
   } else if (rowCoord + shipLength <= 10) {
     // Vertical position, only if it fits
@@ -70,9 +135,10 @@ function hideRelevantSquares(ship, rowCoord, columnCoord, shipLength) {
     );
     ship.style.position = "absolute";
     ship.style.left = `${(squareSizes + gapSize) * columnCoord}px`;
-    }
+  }
 
   squaresBehind[ship.id] = relevantSquares;
+  squaresSurrounding[ship.id] = surroundingSquares;
 
   return relevantSquares;
 }
@@ -133,12 +199,16 @@ Array.from(popupBoard.children).forEach((row) => {
       draggedShip.setAttribute("coordColumn", squareNumber);
       draggedShip.setAttribute("coordRow", row.getAttribute("data"));
 
-      
-        const relevantSquares = hideRelevantSquares(draggedShip, rowNumber, squareNumber, shipSize);
-        // If there's enough space in grid, append the ship
-        if(relevantSquares !== undefined) {
-            row.insertBefore(draggedShip, square.nextSibling);
-        }
+      const relevantSquares = hideRelevantSquares(
+        draggedShip,
+        rowNumber,
+        squareNumber,
+        shipSize
+      );
+      // If there's enough space in grid, append the ship
+      if (relevantSquares !== undefined) {
+        row.insertBefore(draggedShip, square.nextSibling);
+      }
     });
 
     // When entering square
