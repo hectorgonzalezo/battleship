@@ -1,6 +1,11 @@
-import { player1Board } from "./model";
+import PubSub from "pubsub-js";
+import model from "./model";
+import Ship from "./gameObjects/ship";
 import { SurroundingSquares, ClashChecker } from "./popupSquaresClasses";
-const popupShips = document.querySelectorAll("#ships .ship");
+
+const popup = document.querySelector("#pop-up");
+const shipsArea = document.querySelector("#ships");
+const popupShips = document.querySelectorAll("#pop-up .ship");
 const popupBoard = document.querySelector("#pop-up .board");
 const buttonStart = document.querySelector("#start");
 
@@ -73,6 +78,15 @@ function getNumberValueFromProperty(ship, property) {
   );
 }
 
+// Extract values from ship div
+function getValuesFromShipElement(ship) {
+  const rowCoord = Number(ship.getAttribute("coordrow"));
+  const columnCoord = Number(ship.getAttribute("coordcolumn"));
+  const shipLength = Number(ship.getAttribute("data"));
+
+  return [shipLength, rowCoord, columnCoord];
+}
+
 function hideRelevantSquares(ship, rowCoord, columnCoord, shipLength) {
   let relevantSquares = [];
   let surroundingSquares = [];
@@ -137,9 +151,11 @@ function hideRelevantSquares(ship, rowCoord, columnCoord, shipLength) {
 // This function is used by the ship event listener
 function allowVerticalRotationOnBoard(e) {
   const ship = e.target.parentElement;
-  const rowCoord = Number(ship.getAttribute("coordrow"));
-  const columnCoord = Number(ship.getAttribute("coordcolumn"));
-  const shipLength = Number(ship.getAttribute("data"));
+  let rowCoord;
+  let columnCoord;
+  let shipLength;
+
+  [shipLength, rowCoord, columnCoord] = getValuesFromShipElement(ship);
 
   if (
     (!new ClashChecker(
@@ -257,5 +273,20 @@ Array.from(popupBoard.children).forEach((row) => {
 // Start game with button
 buttonStart.addEventListener("click", () => {
   // Start game
-  console.log("start");
+  // If player finished placing ships
+  if (shipsArea.children.length === 0) {
+    popupShips.forEach((ship) => {
+      const [shipLength, rowCoord, columnCoord] =
+        getValuesFromShipElement(ship);
+      const newShip = Ship(shipLength);
+      // Append each ship to player board
+      model.player1Board.placeShip(newShip, rowCoord, columnCoord);
+    });
+    // Hide popup
+    popup.classList.add("inactive");
+    // Show game
+    document.querySelector("#game").classList.remove("inactive");
+
+    PubSub.publish("game-started", model.player1Board);
+  }
 });

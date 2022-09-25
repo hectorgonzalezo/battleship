@@ -68,20 +68,22 @@ function updateDisplay(string) {
   infoDisplay.innerText = string;
 }
 
-async function renderRandomShips(player1Board, player2Board) {
-  await renderShips(player1Board);
-  await renderShips(player2Board);
-  PubSub.publish("enemy-loaded");
-}
-
-function startBoards(player1Board, player2Board) {
+async function startBoards(player2Board) {
   createNewBoardElement(player1DivBoard);
   // Adds a special class for enemies, so that you can point and shoot.
   createNewBoardElement(player2DivBoard, true);
   createNewBoardElement(chooseBoard);
 
-  renderRandomShips(player1Board, player2Board);
+  await renderShips(player2Board);
+  PubSub.publish("enemy-loaded");
 }
+
+function renderPlayer1Ships(msg, data) {
+  const player1Board = data;
+  renderShips(player1Board);
+}
+
+PubSub.subscribe("game-started", renderPlayer1Ships);
 
 const view = {
   startBoards,

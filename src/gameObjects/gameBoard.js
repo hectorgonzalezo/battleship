@@ -159,15 +159,17 @@ const Gameboard = function (playerNumber) {
           positionObject.shipSquare = i;
           positionObject.direction = direction;
         }
-      } else if (direction === "vertical") {
-        // if direction is vertical
-        for (let i = 0; i < length; i++) {
-          const positionObject = boardSquares[rowCoord + i][columnCoord];
-          positionObject.ship = ship;
-          positionObject.shipSquare = i;
-          positionObject.direction = direction;
-        }
+
+        return ship;
       }
+      // if direction is vertical
+      for (let i = 0; i < length; i++) {
+        const positionObject = boardSquares[rowCoord + i][columnCoord];
+        positionObject.ship = ship;
+        positionObject.shipSquare = i;
+        positionObject.direction = direction;
+      }
+
       return ship;
     }
   }
@@ -215,6 +217,7 @@ const Gameboard = function (playerNumber) {
         randomColumnCoord,
         randomDirection
       );
+      console.log(ship);
       // If ship was succesfully placed, append it to array
       if (ship !== undefined) {
         ships.push(ship);
