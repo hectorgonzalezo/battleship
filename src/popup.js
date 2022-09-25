@@ -151,11 +151,8 @@ function hideRelevantSquares(ship, rowCoord, columnCoord, shipLength) {
 // This function is used by the ship event listener
 function allowVerticalRotationOnBoard(e) {
   const ship = e.target.parentElement;
-  let rowCoord;
-  let columnCoord;
-  let shipLength;
 
-  [shipLength, rowCoord, columnCoord] = getValuesFromShipElement(ship);
+  const [shipLength, rowCoord, columnCoord] = getValuesFromShipElement(ship);
 
   if (
     (!new ClashChecker(
@@ -201,7 +198,7 @@ popupShips.forEach((ship) => {
   });
 
   // Rotate on double click
-  ship.addEventListener("dblclick", allowVerticalRotation);
+  ship.addEventListener("click", allowVerticalRotation);
 });
 
 // Make each square in board droppable
@@ -219,9 +216,9 @@ Array.from(popupBoard.children).forEach((row) => {
 
       // So it can be rotated
       draggedShip.classList.add("dragged-in");
-      draggedShip.removeEventListener("dblclick", allowVerticalRotation);
+      draggedShip.removeEventListener("click", allowVerticalRotation);
       // Changes vertical rotation behavior when inside the board
-      draggedShip.addEventListener("dblclick", allowVerticalRotationOnBoard);
+      draggedShip.addEventListener("click", allowVerticalRotationOnBoard);
 
       // Add coordinates to object
       draggedShip.setAttribute("coordcolumn", squareNumber);

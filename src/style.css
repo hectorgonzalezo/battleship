@@ -20,9 +20,9 @@
   font-family: "Roboto", sans-serif;
 }
 
-/* * {
-    outline: dashed red;
-}  */
+* {
+  outline: dashed red;
+}
 
 body {
   position: relative;
@@ -119,6 +119,7 @@ main > h1 {
 .square.enemy.hit {
   pointer-events: none;
 }
+
 .ship-square:not(.enemy:not(.hit)) {
   --border-size: 6px;
   --border-color: rgb(61, 55, 55);
@@ -181,10 +182,6 @@ footer {
   width: 100vw;
   height: 100vh;
   background-color: var(--color-background);
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   display: grid;
   justify-items: center;
   align-items: center;
@@ -232,17 +229,23 @@ footer {
   padding: 20px;
 }
 
-#ships {
+#ships-wrapper {
   grid-area: ships;
-  display: grid;
+  justify-self: start;
+  position: relative;
+  align-items: flex-start;
+}
+
+#ships {
+  display: flex;
   justify-items: flex-start;
-  gap: 10px;
+  gap: 20px;
+  column-gap: 20px;
   flex-wrap: wrap;
   position: relative;
   height: var(--board-size);
   max-width: var(--board-size);
-  padding: 30px;
-  justify-self: start;
+  padding: 20px;
   align-items: flex-start;
 }
 
@@ -255,7 +258,7 @@ footer {
   display: flex;
   gap: var(--board-gap);
   background-color: grey;
-  height: var(--square-size);
+  min-height: var(--square-size);
 }
 
 .ship.vertical {
@@ -299,5 +302,19 @@ footer {
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  #pop-up {
+    height: auto;
+    background-color: var(--color-background);
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    align-items: center;
+    gap: 20px;
+  }
+
+  #ships {
+    height: 50%;
   }
 }
