@@ -274,7 +274,7 @@ Array.from(popupBoard.children).forEach((row) => {
 buttonStart.addEventListener("click", () => {
   // Start game
   // If player finished placing ships
-  if (shipsArea.children.length === 0) {
+  if (shipsArea.children.length === 1) {
     popupShips.forEach((ship) => {
       const [shipLength, rowCoord, columnCoord] =
         getValuesFromShipElement(ship);

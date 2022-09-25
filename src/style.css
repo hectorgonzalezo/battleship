@@ -5,18 +5,18 @@
 :root {
   --square-size: 43px;
   --board-gap: 2px;
-  --board-size: calc(calc(var(--ship-size) * 10) + calc(var(--board-gap) * 10));
-  --color-water: rgb(135, 217, 214);
-  --color-water-dark: rgb(56, 127, 125);
+  --board-size: calc(
+    calc(var(--square-size) * 10) + calc(var(--board-gap) * 10)
+  );
+  --color-target: blue;
+  --color-ship: rgb(136, 134, 134);
+  --color-ship-hit: rgb(232, 108, 108);
+  --color-ship-just-hit: rgb(173, 17, 17);
+  --color-water: rgb(157, 240, 237);
+  --color-hit: rgb(41, 125, 122);
+  --color-water-dark: rgb(52, 127, 124);
   --color-background: #27272a;
   --color-light: #f4f4f5;
-  --color-medium-light: #a1a1aa;
-  --color-medium-dark: #52525b;
-  --color-dark: #3f3f46;
-  --color-complementary1-light: rgb(162, 242, 144);
-  --color-complementary1-dark: rgb(14, 60, 13);
-  --color-complementary2-light: rgb(245, 176, 118);
-  --color-complementary2-dark: rgb(131, 63, 14);
   font-family: "Roboto", sans-serif;
 }
 
@@ -45,7 +45,6 @@ body {
   display: none;
   position: absolute;
   left: -100%;
-  background-color: red;
   transition: all 2s;
 }
 
@@ -112,30 +111,51 @@ main > h1 {
 .square.enemy {
   background-color: #52525b;
 }
-.ship-square {
-  background-color: blue;
-  width: var(--square-size);
-  height: var(--square-size);
+
+.square.enemy:hover {
+  cursor: crosshair;
+}
+
+.square.enemy.hit {
+  pointer-events: none;
+}
+.ship-square:not(.enemy:not(.hit)) {
+  --border-size: 6px;
+  --border-color: rgb(61, 55, 55);
+  background-color: var(--color-ship);
+  width: calc(var(--square-size) - calc(var(--border-size) * 2));
+  height: calc(var(--square-size) - calc(var(--border-size) * 2));
+  border: var(--border-color) solid var(--border-size);
 }
 
 .square.ship-square.hit {
-  background-color: green;
+  background-color: var(--color-ship-hit);
 }
 
 .square.ship-square.hit.just-hit {
-  background-color: rgb(1, 43, 1);
+  background-color: var(--color-ship-just-hit);
 }
 .square.hit {
-  transition: all 1s;
-  background-color: yellow;
+  transition: background-color 0.5s;
+  background-color: var(--color-hit);
+  position: relative;
+}
+
+.square.hit:not(.ship-square)::before {
+  text-align: center;
+  content: ".";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -70%);
 }
 
 .square.hit.just-hit {
-  background-color: red;
+  outline: solid yellow 1px;
 }
 
 .square.enemy:hover {
-  background-color: rgb(227, 134, 134);
+  background-color: var(--color-target);
 }
 
 footer {
@@ -215,12 +235,15 @@ footer {
 #ships {
   grid-area: ships;
   display: grid;
+  justify-items: flex-start;
   gap: 10px;
   flex-wrap: wrap;
   position: relative;
+  height: var(--board-size);
   max-width: var(--board-size);
   padding: 30px;
   justify-self: start;
+  align-items: flex-start;
 }
 
 #ships .ship.hide {
@@ -231,7 +254,8 @@ footer {
 .ship {
   display: flex;
   gap: var(--board-gap);
-  z-index: 3;
+  background-color: grey;
+  height: var(--square-size);
 }
 
 .ship.vertical {
@@ -245,7 +269,6 @@ footer {
 
 #pop-up .board .ship {
   position: absolute;
-  background-color: black;
 }
 
 .square.drag-over {
