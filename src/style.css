@@ -237,11 +237,12 @@ footer {
 
 #pop-up .board {
   max-height: var(--board-size);
+  position: relative;
 }
 
-#pop-up .board .ship.vertical {
-  position: static;
-  z-index: 10;
+#pop-up .board .ship {
+  position: absolute;
+  background-color: black;
 }
 
 .square.drag-over {
@@ -249,7 +250,7 @@ footer {
 }
 
 .square.behind {
-  display: none;
+  background-color: green;
 }
 
 @media only screen and (max-width: 950px) {

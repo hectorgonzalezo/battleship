@@ -1,4 +1,5 @@
 import { player1Board } from "./model";
+import { SurroundingSquares, ClashChecker } from "./popupSquaresClasses";
 const popupShips = document.querySelectorAll("#ships .ship");
 const popupBoard = document.querySelector("#pop-up .board");
 const buttonStart = document.querySelector("#start");
@@ -38,79 +39,6 @@ function allowVerticalRotation(e) {
   e.target.parentElement.classList.toggle("vertical");
 }
 
-// This prevents the user from placing ships besides each other
-// without at least 1 space between them
-function getSurroundingSquaresHorizontal(
-  siblings,
-  rowCoord,
-  columnCoord,
-  shipLength
-) {
-  const iSquareBefore = Math.max(columnCoord - 1, 0);
-  const iSquareAfter = Math.min(columnCoord + shipLength, 9);
-  const iRowBefore = Math.max(rowCoord - 1, 0);
-  const iRowAfter = Math.min(rowCoord + 1, 9);
-
-  let rowBefore = Array.from(
-    Array.from(popupBoard.children)[iRowBefore].children
-  );
-  rowBefore = rowBefore.filter((square) => !square.classList.contains("ship"));
-  let rowAfter = Array.from(
-    Array.from(popupBoard.children)[iRowAfter].children
-  );
-  rowAfter = rowAfter.filter((square) => !square.classList.contains("ship"));
-
-  let surroundingSquares = [siblings[iSquareBefore], siblings[iSquareAfter]];
-  const upperSquares = rowBefore.slice(iSquareBefore, iSquareAfter + 1);
-  const lowerSquares = rowAfter.slice(iSquareBefore, iSquareAfter + 1);
-
-  surroundingSquares = surroundingSquares.concat(upperSquares);
-  surroundingSquares = surroundingSquares.concat(lowerSquares);
-
-  return surroundingSquares;
-}
-
-function getSurroundingSquaresVertical(rowCoord, columnCoord, shipLength) {
-  const iSquareBefore = Math.max(columnCoord - 1, 0);
-  const iSquareAfter = Math.min(columnCoord + 1, 9);
-  const iRowBefore = Math.max(rowCoord - 1, 0);
-  const iRowAfter = Math.min(rowCoord + shipLength, 9);
-
-  // upper and lower rows
-  let rowBefore = Array.from(
-    Array.from(popupBoard.children)[iRowBefore].children
-  )
-    .filter((square) => !square.classList.contains("ship"))
-    .slice(iSquareBefore, iSquareAfter + 1);
-  rowBefore = rowBefore.filter((square) => !square.classList.contains("ship"));
-  let rowAfter = Array.from(Array.from(popupBoard.children)[iRowAfter].children)
-    .filter((square) => !square.classList.contains("ship"))
-    .slice(iSquareBefore, iSquareAfter + 1);
-  rowAfter = rowAfter.filter((square) => !square.classList.contains("ship"));
-
-  // squares before and after
-  let shipRows = Array.from(popupBoard.children).filter(
-    (square) => !square.classList.contains("ship")
-  );
-  shipRows = shipRows.slice(rowCoord, rowCoord + shipLength);
-  const sideSquares = shipRows
-    .map((row) => {
-      let rowArray = Array.from(row.children);
-      rowArray = rowArray.filter(
-        (square) => !square.classList.contains("ship")
-      );
-      return rowArray.slice(iSquareBefore, iSquareAfter + 1);
-    })
-    .flat();
-  let surroundingSquares = [];
-
-  surroundingSquares = surroundingSquares.concat(rowBefore);
-  surroundingSquares = surroundingSquares.concat(rowAfter);
-  surroundingSquares = surroundingSquares.concat(sideSquares);
-
-  return surroundingSquares;
-}
-
 // Prevents hits from being removed when moving a ship, from the vicinity of another
 function reAddHits() {
   const allHits = Object.values(squaresSurrounding);
@@ -139,118 +67,44 @@ function updateSurroundingSquares(ship) {
   return [previousSquaresBehind, previousSquaresSurrounding];
 }
 
-// Checks if theres a ship or a     surrounding square in the way
-function isClashingHorizontally(ship, rowCoord, columnCoord, shipLength) {
-  if (columnCoord + shipLength > 10) {
-    return true;
-  }
-
-  let siblings = Array.from(Array.from(popupBoard.children)[rowCoord].children);
-  siblings = siblings.filter(
-    (sibling) => sibling.id !== ship.id && !sibling.classList.contains("ship")
+function getNumberValueFromProperty(ship, property) {
+  return Number(
+    getComputedStyle(ship).getPropertyValue(property).match(/\d/g).join("")
   );
-  const prospectiveSquares = siblings.slice(
-    columnCoord,
-    columnCoord + shipLength
-  );
-
-  // check if the rest of the squaresSurrounding arrays include the square
-  const { [ship.id]: omitted, ...restOfArray } = squaresSurrounding;
-  const restOfSquaresSurrounding = Object.values(restOfArray).flat();
-
-  // Return true if any square is a ship or a hit
-  const isAnyClashing = prospectiveSquares.some(
-    (square) =>
-      restOfSquaresSurrounding.includes(square) ||
-      (square.classList.contains("ship") && square.id !== ship.id)
-  );
-  return isAnyClashing;
-}
-
-function isClashingVertically(ship, rowCoord, columnCoord, shipLength) {
-  if (rowCoord + shipLength > 10) {
-    return true;
-  }
-  const prospectiveSquares = [];
-  const rows = Array.from(popupBoard.children).slice(
-    rowCoord,
-    rowCoord + shipLength
-  );
-
-  rows.forEach((row) => {
-    let rowArray = Array.from(row.children);
-    rowArray = rowArray.filter(
-      (square) => square.id !== ship.id || !square.classList.contains("ship")
-    );
-    return rowArray.forEach((square) => {
-      if (Number(square.getAttribute("data")) === columnCoord) {
-        prospectiveSquares.push(square);
-      }
-    });
-  });
-
-  const surroundingSquares = getSurroundingSquaresVertical(
-    rowCoord,
-    columnCoord,
-    shipLength
-  );
-  const isASurroundingSquareShip = surroundingSquares.some((square) =>
-    square.classList.contains("ship")
-  );
-
-  // check if the rest of the squaresSurrounding arrays include the square
-  const { [ship.id]: omitted, ...restOfArray } = squaresSurrounding;
-  const restOfSquaresSurrounding = Object.values(restOfArray).flat();
-
-  // Return true if any square is a ship or a hit
-  const isAnyClashing = prospectiveSquares.some(
-    (square) =>
-      restOfSquaresSurrounding.includes(square) ||
-      isASurroundingSquareShip ||
-      (square.classList.contains("ship") && square.id !== ship.id)
-  );
-  return isAnyClashing;
 }
 
 function hideRelevantSquares(ship, rowCoord, columnCoord, shipLength) {
   let relevantSquares = [];
   let surroundingSquares = [];
 
+  // These two constants are used to place the ship with position: absolute
+  const squareSizes = getNumberValueFromProperty(ship, "--square-size");
+  const gapSize = getNumberValueFromProperty(ship, "--board-gap");
+
+  updateSurroundingSquares(ship);
+
   if (!ship.classList.contains("vertical")) {
-    if (!isClashingHorizontally(ship, rowCoord, columnCoord, shipLength)) {
-      updateSurroundingSquares(ship);
-      // Horizontal position, if it fits and doesn't hit another ship or a surrounding square
-      let siblings = Array.from(
-        Array.from(popupBoard.children)[rowCoord].children
-      );
-      siblings = siblings.filter(
-        (sibling) =>
-          sibling.id !== ship.id && !sibling.classList.contains("ship")
-      );
+    // Horizontal position, if it fits and doesn't hit another ship or a surrounding square
+    const siblings = Array.from(
+      Array.from(popupBoard.children)[rowCoord].children
+    );
+    // Get selected squares
+    relevantSquares = siblings.slice(columnCoord, columnCoord + shipLength);
 
-      // Get selected squares
-      relevantSquares = siblings.slice(columnCoord, columnCoord + shipLength);
+    // Get surrounding squares do add hit
 
-      // Get surrounding squares do add hit
-      surroundingSquares = getSurroundingSquaresHorizontal(
-        siblings,
-        rowCoord,
-        columnCoord,
-        shipLength
-      );
+    surroundingSquares = new SurroundingSquares(
+      rowCoord,
+      columnCoord,
+      shipLength
+    ).getHorizontal();
 
-      surroundingSquares.forEach((surroundingSquare) =>
-        surroundingSquare.classList.add("hit")
-      );
-      // Keep ship in position
-      ship.style.position = "";
-      relevantSquares.forEach((relevantSquare) =>
-        relevantSquare.classList.add("behind")
-      );
-    }
-  } else if (!isClashingVertically(ship, rowCoord, columnCoord, shipLength)) {
+    // Keep ship in position
+    relevantSquares.forEach((relevantSquare) =>
+      relevantSquare.classList.add("behind")
+    );
+  } else {
     // Vertical position, only if it fits
-    updateSurroundingSquares(ship);
     const relevantRows = Array.from(popupBoard.children).slice(
       rowCoord,
       rowCoord + shipLength
@@ -260,31 +114,19 @@ function hideRelevantSquares(ship, rowCoord, columnCoord, shipLength) {
     );
     relevantSquares = relevantSquares.flat();
 
-    surroundingSquares = getSurroundingSquaresVertical(
+    surroundingSquares = new SurroundingSquares(
       rowCoord,
       columnCoord,
       shipLength
-    );
-    surroundingSquares.forEach((surroundingSquare) =>
-      surroundingSquare.classList.add("hit")
-    );
-
-    // make ship position absolute
-    const squareSizes = Number(
-      getComputedStyle(ship)
-        .getPropertyValue("--square-size")
-        .match(/\d/g)
-        .join("")
-    );
-    const gapSize = Number(
-      getComputedStyle(ship)
-        .getPropertyValue("--board-gap")
-        .match(/\d/g)
-        .join("")
-    );
-    ship.style.position = "absolute";
-    ship.style.left = `${(squareSizes + gapSize) * columnCoord}px`;
+    ).getVertical();
   }
+
+  surroundingSquares.forEach((surroundingSquare) =>
+    surroundingSquare.classList.add("hit")
+  );
+
+  ship.style.top = `${(squareSizes + gapSize) * rowCoord}px`;
+  ship.style.left = `${(squareSizes + gapSize) * columnCoord}px`;
 
   squaresBehind[ship.id] = relevantSquares;
   squaresSurrounding[ship.id] = surroundingSquares;
@@ -300,9 +142,23 @@ function allowVerticalRotationOnBoard(e) {
   const shipLength = Number(ship.getAttribute("data"));
 
   if (
-    (!isClashingHorizontally(ship, rowCoord, columnCoord, shipLength) &&
+    (!new ClashChecker(
+      ship,
+      rowCoord,
+      columnCoord,
+      shipLength,
+      squaresBehind,
+      squaresSurrounding
+    ).horizontal() &&
       ship.classList.contains("vertical")) ||
-    (!isClashingVertically(ship, rowCoord, columnCoord, shipLength) &&
+    (!new ClashChecker(
+      ship,
+      rowCoord,
+      columnCoord,
+      shipLength,
+      squaresBehind,
+      squaresSurrounding
+    ).vertical() &&
       !ship.classList.contains("vertical"))
   ) {
     ship.classList.toggle("vertical");
@@ -355,26 +211,29 @@ Array.from(popupBoard.children).forEach((row) => {
       draggedShip.setAttribute("coordcolumn", squareNumber);
       draggedShip.setAttribute("coordrow", row.getAttribute("data"));
 
-      hideRelevantSquares(draggedShip, rowNumber, squareNumber, shipSize);
-
       // If there's enough space in grid, append the ship
       if (
-        (!isClashingHorizontally(
+        (!new ClashChecker(
           draggedShip,
           rowNumber,
           squareNumber,
-          shipSize
-        ) &&
+          shipSize,
+          squaresBehind,
+          squaresSurrounding
+        ).horizontal() &&
           !draggedShip.classList.contains("vertical")) ||
-        (!isClashingVertically(
+        (!new ClashChecker(
           draggedShip,
           rowNumber,
           squareNumber,
-          shipSize
-        ) &&
+          shipSize,
+          squaresBehind,
+          squaresSurrounding
+        ).vertical() &&
           draggedShip.classList.contains("vertical"))
       ) {
-        row.insertBefore(draggedShip, square.nextSibling);
+        hideRelevantSquares(draggedShip, rowNumber, squareNumber, shipSize);
+        popupBoard.appendChild(draggedShip);
       }
     });
 
