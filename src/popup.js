@@ -214,16 +214,6 @@ Array.from(popupBoard.children).forEach((row) => {
       e.target.classList.remove("drag-over");
       const squareNumber = Number(square.getAttribute("data"));
 
-      // So it can be rotated
-      draggedShip.classList.add("dragged-in");
-      draggedShip.removeEventListener("click", allowVerticalRotation);
-      // Changes vertical rotation behavior when inside the board
-      draggedShip.addEventListener("click", allowVerticalRotationOnBoard);
-
-      // Add coordinates to object
-      draggedShip.setAttribute("coordcolumn", squareNumber);
-      draggedShip.setAttribute("coordrow", row.getAttribute("data"));
-
       // If there's enough space in grid, append the ship
       if (
         (!new ClashChecker(
@@ -245,6 +235,15 @@ Array.from(popupBoard.children).forEach((row) => {
         ).vertical() &&
           draggedShip.classList.contains("vertical"))
       ) {
+         // So it can be rotated
+      draggedShip.classList.add("dragged-in");
+      draggedShip.removeEventListener("click", allowVerticalRotation);
+      // Changes vertical rotation behavior when inside the board
+      draggedShip.addEventListener("click", allowVerticalRotationOnBoard);
+        // Add coordinates to object
+      draggedShip.setAttribute("coordcolumn", squareNumber);
+      draggedShip.setAttribute("coordrow", row.getAttribute("data"));
+
         hideRelevantSquares(draggedShip, rowNumber, squareNumber, shipSize);
         popupBoard.appendChild(draggedShip);
       }
@@ -271,7 +270,7 @@ Array.from(popupBoard.children).forEach((row) => {
 buttonStart.addEventListener("click", () => {
   // Start game
   // If player finished placing ships
-  if (shipsArea.children.length === 1) {
+  if (shipsArea.children.length === 0) {
     popupShips.forEach((ship) => {
       const [shipLength, rowCoord, columnCoord] =
         getValuesFromShipElement(ship);
@@ -286,4 +285,17 @@ buttonStart.addEventListener("click", () => {
 
     PubSub.publish("game-started", model.player1Board);
   }
+});
+
+buttonStart.addEventListener("mouseover", () => {
+  if (shipsArea.children.length !== 0) {
+    buttonStart.classList.add("not-yet");
+  } else {
+    buttonStart.classList.add("ready");
+  }
+});
+
+buttonStart.addEventListener("mouseout", () => {
+  buttonStart.classList.remove("not-yet");
+  buttonStart.classList.remove("ready");
 });

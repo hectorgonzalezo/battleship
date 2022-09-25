@@ -3,318 +3,408 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
 
 :root {
-  --square-size: 43px;
-  --board-gap: 2px;
-  --board-size: calc(
-    calc(var(--square-size) * 10) + calc(var(--board-gap) * 10)
-  );
-  --color-target: blue;
-  --color-ship: rgb(136, 134, 134);
-  --color-ship-hit: rgb(232, 108, 108);
-  --color-ship-just-hit: rgb(173, 17, 17);
-  --color-water: rgb(157, 240, 237);
-  --color-hit: rgb(41, 125, 122);
-  --color-water-dark: rgb(52, 127, 124);
-  --color-background: #27272a;
-  --color-light: #f4f4f5;
-  font-family: "Roboto", sans-serif;
+    --square-size: 43px;
+    --board-gap: 2px;
+    --board-size: calc(calc(var(--square-size) * 10) + calc(var(--board-gap) * 10));
+    --color-target: blue;
+    --color-ship: rgb(136, 134, 134);
+    --color-ship-hit: rgb(232, 108, 108);
+    --color-ship-just-hit: rgb(173, 17, 17);
+    --color-water: rgb(157, 240, 237);
+    --color-hit: rgb(41, 125, 122);
+    --color-water-dark: rgb(37, 63, 75);
+    --color-background: #27272a;
+    --color-light: #f4f4f5;
+    --color-complementary-dark: rgb(60, 65, 32);
+    font-family: "Roboto", sans-serif;
 }
 
-* {
+/* * {
   outline: dashed red;
-}
-
+} */
 body {
-  position: relative;
-  height: 100vh;
-  width: 100vw;
-  color: var(--color-light);
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+    color: var(--color-light);
 }
 
 #game {
-  background-color: var(--color-background);
-  height: 100vh;
-  width: 100vw;
-  display: grid;
-  grid-template-rows: 1fr 5fr 50px;
-  align-items: center;
+    background-color: var(--color-background);
+    height: 100vh;
+    width: 100vw;
+    display: grid;
+    grid-template-rows: 1fr 5fr 50px;
+    align-items: center;
 }
 
 #pop-up.inactive,
 #game.inactive {
-  display: none;
-  position: absolute;
-  left: -100%;
-  transition: all 2s;
+    display: none;
+    position: absolute;
+    left: -100%;
+    transition: all 2s;
+}
+
+h1, h3 {
+    font-size: 1.5rem;
 }
 
 header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: end;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: end;
+    position: relative;
 }
 
-header > div {
-  background-color: var(--color-water-dark);
-  width: max(400px, 40vw);
-  color: var(--color-light);
-  padding: 20px;
-  text-align: center;
-  font-size: 2rem;
-  letter-spacing: 0.2rem;
-  border-radius: 1rem;
+header>div {
+    background-color: var(--color-water-dark);
+    width: max(400px, 40vw);
+    color: var(--color-light);
+    padding: 20px;
+    text-align: center;
+    font-size: 2rem;
+    letter-spacing: 0.2rem;
+    border-radius: 1rem;
 }
 
-header > button {
-  background-color: red;
+header>button {
+    
 }
 
 main {
-  width: 100%;
-  display: grid;
-  grid-template-rows: 50px 1fr;
-  grid-template-columns: repeat(2, 1fr);
-  justify-items: center;
-  gap: auto;
-  align-items: center;
+    width: 100%;
+    display: grid;
+    grid-template-rows: 50px 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    justify-items: center;
+    gap: auto;
+    align-items: center;
 }
 
-main > h1 {
-  color: var(--color-light);
-  grid-row: 1 / 2;
+main>h1 {
+    color: var(--color-light);
+    grid-row: 1 / 2;
 }
 
 .board {
-  width: var(--board-size);
-  height: var(--board-size);
-  background-color: var(--color-background);
-  display: flex;
-  flex-direction: column;
-  grid-template-rows: repeat(10, 1fr);
-  gap: var(--board-gap);
+    width: var(--board-size);
+    height: var(--board-size);
+    background-color: var(--color-background);
+    display: flex;
+    flex-direction: column;
+    grid-template-rows: repeat(10, 1fr);
+    gap: var(--board-gap);
 }
 
 .row {
-  display: flex;
-  height: auto;
-  gap: var(--board-gap);
-  position: relative;
+    display: flex;
+    height: auto;
+    gap: var(--board-gap);
+    position: relative;
 }
 
 .square {
-  background-color: var(--color-water);
-  width: var(--square-size);
-  height: var(--square-size);
+    background-color: var(--color-water);
+    width: var(--square-size);
+    height: var(--square-size);
 }
 
 .square.enemy {
-  background-color: #52525b;
+    background-color: #52525b;
 }
 
 .square.enemy:hover {
-  cursor: crosshair;
+    cursor: crosshair;
 }
 
 .square.enemy.hit {
-  pointer-events: none;
+    pointer-events: none;
 }
 
 .ship-square:not(.enemy:not(.hit)) {
-  --border-size: 6px;
-  --border-color: rgb(61, 55, 55);
-  background-color: var(--color-ship);
-  width: calc(var(--square-size) - calc(var(--border-size) * 2));
-  height: calc(var(--square-size) - calc(var(--border-size) * 2));
-  border: var(--border-color) solid var(--border-size);
+    --border-size: 6px;
+    --border-color: rgb(61, 55, 55);
+    background-color: var(--color-ship);
+    width: calc(var(--square-size) - calc(var(--border-size) * 2));
+    height: calc(var(--square-size) - calc(var(--border-size) * 2));
+    border: var(--border-color) solid var(--border-size);
 }
 
 .square.ship-square.hit {
-  background-color: var(--color-ship-hit);
+    background-color: var(--color-ship-hit);
 }
 
 .square.ship-square.hit.just-hit {
-  background-color: var(--color-ship-just-hit);
+    background-color: var(--color-ship-just-hit);
 }
+
 .square.hit {
-  transition: background-color 0.5s;
-  background-color: var(--color-hit);
-  position: relative;
+    transition: background-color 0.5s;
+    background-color: var(--color-hit);
+    position: relative;
 }
 
 .square.hit:not(.ship-square)::before {
-  text-align: center;
-  content: ".";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -70%);
+    text-align: center;
+    content: ".";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -70%);
 }
 
 .square.hit.just-hit {
-  outline: solid yellow 1px;
+    outline: solid yellow 1px;
 }
 
 .square.enemy:hover {
-  background-color: var(--color-target);
+    background-color: var(--color-target);
 }
 
 footer {
-  margin-top: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 50px;
-  width: 100%;
-  gap: 2vw;
-  background-color: var(--color-background);
-  color: white;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  font-size: 1.5rem;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    width: 100%;
+    gap: 2vw;
+    background-color: var(--color-background);
+    color: white;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+        Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 1.5rem;
 }
 
 #github-logo {
-  height: 30px;
+    height: 30px;
 }
 
 #pop-up {
-  width: 100vw;
-  height: 100vh;
-  background-color: var(--color-background);
-  display: grid;
-  justify-items: center;
-  align-items: center;
-  grid-template-rows: 100px 50px 1fr;
-  grid-template-columns: 2fr 1fr;
-  grid-template-areas:
-    "title title"
-    "description description"
-    "board ships";
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--color-background);
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    grid-template-rows: 100px 50px 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        "title title"
+        "description description"
+        "board ships";
 }
 
 #pop-up article {
-  grid-area: title;
+    grid-area: title;
 }
 
 #pop-up #description {
-  grid-area: description;
-  justify-self: stretch;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 50px;
-  padding: 20px;
+    grid-area: description;
+    justify-self: stretch;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    padding: 20px;
 }
 
 #pop-up .board {
-  grid-area: board;
+    grid-area: board;
+    justify-self: end;
 }
 
 #pop-up article {
-  background: linear-gradient(
-    to bottom,
-    rgb(135, 135, 236),
-    var(--color-water)
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-align: center;
+    background: linear-gradient(to bottom,
+            rgb(135, 135, 236),
+            var(--color-water));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+}
+
+
+a {
+    width: 150px;
+    padding: 20px 30px;
+    position: relative;
+    display: block;
+    text-decoration: none;
+    overflow: hidden;
+    justify-self: flex-end;
+}
+
+a.not-yet > span{
+    box-shadow: 0px 0px 4px 4px red;
+}
+
+a.ready > span{
+    box-shadow: 0px 0px 4px 4px green;
+}
+
+a:hover > .wave {
+    top: -120px;
+}
+
+a>span {
+    position: relative;
+    z-index: 1;
+    color: var(--color-complementary-dark);
+    font-size: 1.5rem;
+    letter-spacing: 8px;
+    border-radius: 1rem;
+    padding: 3px;
+}
+
+a>.wave {
+    width: 150px;
+    height: 200px;
+    background-color: var(--color-water);
+    box-shadow: inset 0 0 50px var(--color-background);
+    position: absolute;
+    left: 0;
+    top: -80px;
+    transition: 0.4s;
+}
+
+a>.wave::before,
+a> .wave::after {
+    width: 130%;
+    height: 200%;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 40%;
+    transform: translate(-50%, -75%);
+}
+
+a>.wave::before {
+    border-radius: 45%;
+    background-color: var(--color-water-dark);
+    animation: wave 10s linear infinite;
+}
+
+a> .wave::after {
+    border-radius: 40%;
+    background-color: rgb(80, 165, 180);
+    animation: wave 20s linear infinite;
 }
 
 #title {
-  font-size: 3rem;
-  font-weight: bold;
-  letter-spacing: 0.3rem;
-  padding: 20px;
+    font-size: 3rem;
+    font-weight: bold;
+    letter-spacing: 0.3rem;
+    padding: 20px;
 }
 
 #ships-wrapper {
-  grid-area: ships;
-  justify-self: start;
-  position: relative;
-  align-items: flex-start;
+    grid-area: ships;
+    justify-self: start;
+    position: relative;
+    align-items: flex-start;
 }
 
 #ships {
-  display: flex;
-  justify-items: flex-start;
-  gap: 20px;
-  column-gap: 20px;
-  flex-wrap: wrap;
-  position: relative;
-  height: var(--board-size);
-  max-width: var(--board-size);
-  padding: 20px;
-  align-items: flex-start;
+    display: flex;
+    justify-items: flex-start;
+    gap: 20px;
+    column-gap: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    height: var(--board-size);
+    max-width: var(--board-size);
+    padding: 20px;
+    align-items: flex-start;
 }
 
 #ships .ship.hide {
-  opacity: 0.3;
-  display: none;
+    opacity: 0.3;
+    display: none;
 }
 
 .ship {
-  display: flex;
-  gap: var(--board-gap);
-  background-color: grey;
-  min-height: var(--square-size);
+    display: flex;
+    gap: var(--board-gap);
+    background-color: grey;
+    min-height: var(--square-size);
 }
 
 .ship.vertical {
-  flex-direction: column;
+    flex-direction: column;
 }
 
 #pop-up .board {
-  max-height: var(--board-size);
-  position: relative;
+    max-height: var(--board-size);
+    position: relative;
 }
 
 #pop-up .board .ship {
-  position: absolute;
+    position: absolute;
 }
 
 .square.drag-over {
-  background-color: yellow;
+    background-color: yellow;
 }
 
 .square.behind {
-  background-color: green;
+    background-color: green;
 }
 
 @media only screen and (max-width: 950px) {
-  main {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    justify-content: space-evenly;
-    gap: 30px;
-    padding-top: 20px;
-  }
+    main {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        justify-content: space-evenly;
+        gap: 30px;
+        padding-top: 20px;
+    }
 
-  header {
-    align-self: center;
-  }
-  #game {
-    background-color: var(--color-background);
-    height: auto;
-    width: 100vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+    header {
+        align-self: center;
+        width: 100%;
+    }
 
-  #pop-up {
-    height: auto;
-    background-color: var(--color-background);
-    display: flex;
-    flex-direction: column;
-    justify-items: center;
-    align-items: center;
-    gap: 20px;
-  }
+    header>button {
+        top: 100px;
+    }
 
-  #ships {
-    height: 50%;
-  }
+    #game {
+        background-color: var(--color-background);
+        height: auto;
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #pop-up {
+        height: auto;
+        background-color: var(--color-background);
+        display: flex;
+        flex-direction: column;
+        justify-items: center;
+        align-items: center;
+        gap: 20px;
+        min-height: 100%;
+    }
+
+    #ships {
+        height: 50%;
+    }
 }
+
+
+@keyframes wave {
+    0% {
+        transform: translate(-50%, -75%) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(-50%, -75%) rotate(360deg);
+    }
+}
+
+

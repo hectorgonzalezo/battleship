@@ -2,8 +2,13 @@ import PubSub from "pubsub-js";
 import view from "./view";
 import model from "./model";
 
-// Listener functions
+const buttonRestart = document.querySelector('#restart');
+// Restart webpage when pressing button
+buttonRestart.addEventListener('click', () => {
+    document.location.reload(true);
+})
 
+// Listener functions
 function enemySquaresListener(event) {
   const square = event.target;
   const rowCoord = square.parentElement.getAttribute("data");

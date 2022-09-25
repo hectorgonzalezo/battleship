@@ -13,12 +13,12 @@
         <div>
           <h3>Your turn!</h3>
         </div>
-        <button>Restart</button>
+        <button id="restart">Restart</button>
       </header>
       <main>
         <h1>Player's Board</h1>
         <div id="player1-board" class="board"></div>
-        <h1>Enemy's board</h1>
+        <h1>Opponent's board</h1>
         <div id="player2-board" class="board"></div>
       </main>
       <footer>
@@ -36,7 +36,10 @@
       <div id="description">
         <h3>Drag and drop to place your ships</h3>
 
-        <button id="start">start</button>
+        <a href="javascript:void(0)" id="start">
+            <span>Start</span>
+            <div class="wave"></div>
+          </a>
       </div>
       <div id="choose-board" class="board"></div>
 

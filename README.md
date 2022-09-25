@@ -17,3 +17,4 @@ This project is made as a way to practice TDD using [Jest](https://jestjs.io/) t
 ## Acknowledgements
 
 - Tab icons by [Icons8](https://icons8.com).
+- Start button by [Oğuzhan Ağyar](https://codepen.io/oguzhanagyar).
