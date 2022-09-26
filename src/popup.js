@@ -83,8 +83,9 @@ function getValuesFromShipElement(ship) {
   const rowCoord = Number(ship.getAttribute("coordrow"));
   const columnCoord = Number(ship.getAttribute("coordcolumn"));
   const shipLength = Number(ship.getAttribute("data"));
+  const direction = ship.classList.contains('vertical') ? 'vertical' : 'horizontal';
 
-  return [shipLength, rowCoord, columnCoord];
+  return [shipLength, rowCoord, columnCoord, direction];
 }
 
 function hideRelevantSquares(ship, rowCoord, columnCoord, shipLength) {
@@ -272,11 +273,11 @@ buttonStart.addEventListener("click", () => {
   // If player finished placing ships
   if (shipsArea.children.length === 0) {
     popupShips.forEach((ship) => {
-      const [shipLength, rowCoord, columnCoord] =
+      const [shipLength, rowCoord, columnCoord, direction] =
         getValuesFromShipElement(ship);
       const newShip = Ship(shipLength);
       // Append each ship to player board
-      model.player1Board.placeShip(newShip, rowCoord, columnCoord);
+      model.player1Board.placeShip(newShip, rowCoord, columnCoord, direction);
     });
     // Hide popup
     popup.classList.add("inactive");

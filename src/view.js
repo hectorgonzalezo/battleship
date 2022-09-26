@@ -1,9 +1,10 @@
 import PubSub from "pubsub-js";
 
+
 const player1DivBoard = document.querySelector("#player1-board");
 const player2DivBoard = document.querySelector("#player2-board");
 const chooseBoard = document.querySelector("#choose-board");
-const infoDisplay = document.querySelector("header > div");
+const infoDisplay = document.querySelector("header h1");
 
 function createNewBoardElement(board, enemy = false) {
   const fakeBoard = Array(10)
@@ -65,7 +66,10 @@ function updateBoardAt(board, rowCoord, columnCoord, updatingHits = false) {
 }
 
 function updateDisplay(string) {
+    infoDisplay.classList.remove('typing');
+    void infoDisplay.offsetWidth;
   infoDisplay.innerText = string;
+    infoDisplay.classList.add('typing');
 }
 
 async function startBoards(player2Board) {

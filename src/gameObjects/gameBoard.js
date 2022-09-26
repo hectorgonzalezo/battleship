@@ -217,7 +217,6 @@ const Gameboard = function (playerNumber) {
         randomColumnCoord,
         randomDirection
       );
-      console.log(ship);
       // If ship was succesfully placed, append it to array
       if (ship !== undefined) {
         ships.push(ship);

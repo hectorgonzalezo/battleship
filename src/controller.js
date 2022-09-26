@@ -56,7 +56,7 @@ function play1(rowCoord, columnCoord) {
 }
 
 // Player 2 turn
-function play2(minWait = 1000, closeTo = null, sankShip = false) {
+function play2(minWait = 2000, closeTo = null, sankShip = false) {
   // play 2
   view.updateDisplay("Player2 turn");
   setTimeout(() => {
@@ -73,7 +73,7 @@ function play2(minWait = 1000, closeTo = null, sankShip = false) {
     // Only stop turn after not hitting a target
     if (hit.ship !== undefined) {
       // Recursive call
-      play2(minWait * 2, coords, hit.ship.isSunk());
+      play2(minWait + 2000, coords, hit.ship.isSunk());
     } else if (model.player1Board.areAllShipsSunk()) {
       // If player 2 won stop the game
       view.updateDisplay("Sorry, you lost!");
