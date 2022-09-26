@@ -15,7 +15,7 @@
   --color-water: rgb(157, 240, 237);
   --color-hit: rgb(41, 125, 122);
   --color-water-dark: rgb(37, 63, 75);
-  --color-background: #27272a;
+  --color-background: #08082e;
   --color-light: #f4f4f5;
   --color-complementary-light: rgb(205, 226, 72);
   --color-complementary-dark: rgb(60, 65, 32);
@@ -54,6 +54,8 @@ h3 {
   font-size: 1.5rem;
 }
 
+
+
 header {
   display: flex;
   align-items: center;
@@ -62,15 +64,11 @@ header {
   position: relative;
 }
 
-header > div {
-  background-color: var(--color-water-dark);
-  width: max(400px, 40vw);
-  color: var(--color-light);
-  padding: 20px;
-  text-align: center;
+header h1 {
+  color: var(--color-complementary-light);
   font-size: 2rem;
   letter-spacing: 0.2rem;
-  border-radius: 1rem;
+  /* outline: solid 1px var(--color-light); */
 }
 
 header > button {
@@ -78,6 +76,17 @@ header > button {
   top: 80px;
   right: min(5vw, 80px);
 }
+
+header >  div > h1.typing{
+    overflow: hidden; /* Ensures the content is not revealed until the animation */
+    border-right: .15em solid var(--color-complementary-light); /* The typwriter cursor */
+    white-space: nowrap; /* Keeps the content on a single line */
+    margin: 0 auto; /* Gives that scrolling effect as the typing happens */
+    letter-spacing: .15em; /* Adjust as needed */
+    animation: 
+      typing 1s steps(40, end),
+      blink-caret .75s step-end infinite;
+  }
 
 main {
   width: 100%;
@@ -213,7 +222,6 @@ footer {
 
 #pop-up #description {
   grid-area: description;
-  justify-self: stretch;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -402,3 +410,15 @@ button.ready:hover {
     background-position: 18vw;
   }
 }
+
+/* The typing effect */
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+  }
+  
+  /* The typewriter cursor effect */
+  @keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: var(--color-complementary-light); }
+  }
