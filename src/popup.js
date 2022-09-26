@@ -235,14 +235,14 @@ Array.from(popupBoard.children).forEach((row) => {
         ).vertical() &&
           draggedShip.classList.contains("vertical"))
       ) {
-         // So it can be rotated
-      draggedShip.classList.add("dragged-in");
-      draggedShip.removeEventListener("click", allowVerticalRotation);
-      // Changes vertical rotation behavior when inside the board
-      draggedShip.addEventListener("click", allowVerticalRotationOnBoard);
+        // So it can be rotated
+        draggedShip.classList.add("dragged-in");
+        draggedShip.removeEventListener("click", allowVerticalRotation);
+        // Changes vertical rotation behavior when inside the board
+        draggedShip.addEventListener("click", allowVerticalRotationOnBoard);
         // Add coordinates to object
-      draggedShip.setAttribute("coordcolumn", squareNumber);
-      draggedShip.setAttribute("coordrow", row.getAttribute("data"));
+        draggedShip.setAttribute("coordcolumn", squareNumber);
+        draggedShip.setAttribute("coordrow", row.getAttribute("data"));
 
         hideRelevantSquares(draggedShip, rowNumber, squareNumber, shipSize);
         popupBoard.appendChild(draggedShip);

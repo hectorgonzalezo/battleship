@@ -2,11 +2,11 @@ import PubSub from "pubsub-js";
 import view from "./view";
 import model from "./model";
 
-const buttonRestart = document.querySelector('#restart');
+const buttonRestart = document.querySelector("#restart");
 // Restart webpage when pressing button
-buttonRestart.addEventListener('click', () => {
-    document.location.reload(true);
-})
+buttonRestart.addEventListener("click", () => {
+  document.location.reload(true);
+});
 
 // Listener functions
 function enemySquaresListener(event) {
