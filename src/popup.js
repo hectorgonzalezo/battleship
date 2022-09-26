@@ -44,12 +44,12 @@ function allowVerticalRotation(e) {
   e.target.parentElement.classList.toggle("vertical");
 }
 
-// Prevents hits from being removed when moving a ship, from the vicinity of another
-function reAddHits() {
-  const allHits = Object.values(squaresSurrounding);
-  allHits.forEach((hits) => {
-    if (Array.isArray(hits)) {
-      hits.forEach((hit) => hit.classList.add("hit"));
+// Prevents blocks from being removed when moving a ship, from the vicinity of another
+function reAddblocks() {
+  const allblocks = Object.values(squaresSurrounding);
+  allblocks.forEach((blocks) => {
+    if (Array.isArray(blocks)) {
+      blocks.forEach((block) => block.classList.add("block"));
     }
   });
 }
@@ -61,13 +61,13 @@ function updateSurroundingSquares(ship) {
     squareBehind.classList.remove("behind")
   );
 
-  // Remove hit from previous surrounding squares
+  // Remove block from previous surrounding squares
   const previousSquaresSurrounding = squaresSurrounding[ship.id];
   squaresSurrounding[ship.id].forEach((squareSurrounding) => {
-    squareSurrounding.classList.remove("hit");
-    // Re add hit if it belongs to another ship
+    squareSurrounding.classList.remove("block");
+    // Re add block if it belongs to another ship
     squaresSurrounding[ship.id] = {};
-    reAddHits();
+    reAddblocks();
   });
   return [previousSquaresBehind, previousSquaresSurrounding];
 }
@@ -98,14 +98,14 @@ function hideRelevantSquares(ship, rowCoord, columnCoord, shipLength) {
   updateSurroundingSquares(ship);
 
   if (!ship.classList.contains("vertical")) {
-    // Horizontal position, if it fits and doesn't hit another ship or a surrounding square
+    // Horizontal position, if it fits and doesn't block another ship or a surrounding square
     const siblings = Array.from(
       Array.from(popupBoard.children)[rowCoord].children
     );
     // Get selected squares
     relevantSquares = siblings.slice(columnCoord, columnCoord + shipLength);
 
-    // Get surrounding squares do add hit
+    // Get surrounding squares do add block
 
     surroundingSquares = new SurroundingSquares(
       rowCoord,
@@ -136,7 +136,7 @@ function hideRelevantSquares(ship, rowCoord, columnCoord, shipLength) {
   }
 
   surroundingSquares.forEach((surroundingSquare) =>
-    surroundingSquare.classList.add("hit")
+    surroundingSquare.classList.add("block")
   );
 
   ship.style.top = `${(squareSizes + gapSize) * rowCoord}px`;

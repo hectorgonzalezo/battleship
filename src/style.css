@@ -152,6 +152,10 @@ main > h1 {
   position: relative;
 }
 
+.square.block {
+    opacity: 0.7;
+  }
+
 .square.hit:not(.ship-square)::before {
   text-align: center;
   content: ".";
