@@ -10,9 +10,9 @@
   <body>
     <div id="game" class="inactive">
       <header>
-          <div>
-              <h1 class="typing">Your turn!</h1>
-          </div>
+        <div>
+          <h1 class="typing">Your turn!</h1>
+        </div>
         <button id="restart" class="ready">Restart</button>
       </header>
       <main>
@@ -33,15 +33,12 @@
       <article>
         <h1 id="title">Battleship</h1>
       </article>
-      <div id="description">
-        <h3>Drag and drop to place your ships</h3>
-
-        <button id="start">Start Game</button>
-      </div>
       <div id="choose-board" class="board"></div>
-
       <div id="ships-wrapper">
-        <h3>Click a ship to rotate it</h3>
+        <div id="ships-instructions">
+          <h3>Drag and drop to place your ships</h3>
+          <h3>Click a ship to rotate it</h3>
+        </div>
         <div id="ships">
           <div id="carrier" class="ship" draggable="true" data="5">
             <div class="ship-square"></div>
@@ -80,6 +77,14 @@
           </div>
         </div>
       </div>
+      <button id="start">Start Game</button>
+      <footer>
+        <h2>Héctor González Orozco</h2>
+        <a href="https://github.com/hectorgonzalezo/battleship">
+          <img alt="github logo" id="github-logo"
+          src=<%=require("./assets/github-logo.png")%> >
+        </a>
+      </footer>
     </div>
   </body>
 </html>

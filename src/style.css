@@ -54,8 +54,6 @@ h3 {
   font-size: 1.5rem;
 }
 
-
-
 header {
   display: flex;
   align-items: center;
@@ -77,16 +75,14 @@ header > button {
   right: min(5vw, 80px);
 }
 
-header >  div > h1.typing{
-    overflow: hidden; /* Ensures the content is not revealed until the animation */
-    border-right: .15em solid var(--color-complementary-light); /* The typwriter cursor */
-    white-space: nowrap; /* Keeps the content on a single line */
-    margin: 0 auto; /* Gives that scrolling effect as the typing happens */
-    letter-spacing: .15em; /* Adjust as needed */
-    animation: 
-      typing 1s steps(40, end),
-      blink-caret .75s step-end infinite;
-  }
+header > div > h1.typing {
+  overflow: hidden; /* Ensures the content is not revealed until the animation */
+  border-right: 0.15em solid var(--color-complementary-light); /* The typwriter cursor */
+  white-space: nowrap; /* Keeps the content on a single line */
+  margin: 0 auto; /* Gives that scrolling effect as the typing happens */
+  letter-spacing: 0.15em; /* Adjust as needed */
+  animation: typing 1s steps(40, end), blink-caret 0.75s step-end infinite;
+}
 
 main {
   width: 100%;
@@ -162,8 +158,8 @@ main > h1 {
 }
 
 .square.block {
-    opacity: 0.7;
-  }
+  opacity: 0.7;
+}
 
 .square.hit:not(.ship-square)::before {
   text-align: center;
@@ -183,6 +179,7 @@ main > h1 {
 }
 
 footer {
+  grid-area: footer;
   margin-top: auto;
   display: flex;
   align-items: center;
@@ -207,27 +204,20 @@ footer {
   background-color: var(--color-background);
   display: grid;
   justify-items: center;
-  align-items: center;
-  grid-template-rows: 100px 50px 1fr;
+  align-items: start;
+  gap: 10px;
+  grid-template-rows: 1fr 2fr 1fr 50px;
   grid-template-columns: 1fr 1fr;
   grid-template-areas:
     "title title"
-    "description description"
-    "board ships";
+    "board ships"
+    "button button"
+    "footer footer";
 }
 
 #pop-up article {
   grid-area: title;
-}
-
-#pop-up #description {
-  grid-area: description;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 50px;
-  padding: 20px;
-  position: relative;
+  align-self: center;
 }
 
 #pop-up .board {
@@ -255,15 +245,12 @@ button {
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--color-water-dark);
+  position: relative;
 }
 
 button:hover {
   background-color: var(--color-complementary-light);
   cursor: pointer;
-}
-
-button.not-yet {
-  pointer-events: none;
 }
 
 button:active {
@@ -273,16 +260,16 @@ button:active {
   box-shadow: 2px 2px 1px black;
 }
 
-button.not-yet:hover {
+button.not-yet {
   box-shadow: 0px 0px 2px 2px red;
 }
 
-button.not-yet:hover::after {
+button.not-yet::after {
   content: "Place all your ships first";
   color: red;
   font-size: 1rem;
   position: absolute;
-  bottom: 0%;
+  bottom: -100%;
   right: 0%;
 }
 
@@ -304,13 +291,26 @@ button.not-yet:hover::after {
   display: flex;
   justify-items: flex-start;
   gap: 20px;
-  column-gap: 20px;
   flex-wrap: wrap;
   position: relative;
-  height: var(--board-size);
+  min-height: calc(var(--board-size) / 2);
+  max-height: var(--board-size);
   max-width: var(--board-size);
   padding: 20px;
   align-items: flex-start;
+  position: relative;
+}
+
+#ships-instructions {
+  display: flex;
+  flex-direction: column;
+  padding: 0px 20px;
+  gap: 20px;
+}
+
+#pop-up button {
+  grid-area: button;
+  align-self: center;
 }
 
 #ships .ship.hide {
@@ -400,7 +400,8 @@ button.ready:hover {
   background-image: linear-gradient(
     to right,
     var(--color-complementary-light) 0%,
-    var(--color-water) 100%
+    var(--color-water) 50%,
+    var(--color-complementary-light) 100%
   );
   animation: slidebg 2s linear infinite;
 }
@@ -413,12 +414,21 @@ button.ready:hover {
 
 /* The typing effect */
 @keyframes typing {
-    from { width: 0 }
-    to { width: 100% }
+  from {
+    width: 0;
   }
-  
-  /* The typewriter cursor effect */
-  @keyframes blink-caret {
-    from, to { border-color: transparent }
-    50% { border-color: var(--color-complementary-light); }
+  to {
+    width: 100%;
   }
+}
+
+/* The typewriter cursor effect */
+@keyframes blink-caret {
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: var(--color-complementary-light);
+  }
+}

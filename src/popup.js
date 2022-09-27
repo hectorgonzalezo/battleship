@@ -83,7 +83,9 @@ function getValuesFromShipElement(ship) {
   const rowCoord = Number(ship.getAttribute("coordrow"));
   const columnCoord = Number(ship.getAttribute("coordcolumn"));
   const shipLength = Number(ship.getAttribute("data"));
-  const direction = ship.classList.contains('vertical') ? 'vertical' : 'horizontal';
+  const direction = ship.classList.contains("vertical")
+    ? "vertical"
+    : "horizontal";
 
   return [shipLength, rowCoord, columnCoord, direction];
 }
