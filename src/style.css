@@ -271,6 +271,16 @@ button {
   position: relative;
 }
 
+button.ready:hover {
+  background-image: linear-gradient(
+    to right,
+    var(--color-complementary-light) 0%,
+    var(--color-water) 50%,
+    var(--color-complementary-light) 100%
+  );
+  animation: slidebg 2s linear infinite;
+}
+
 button:hover {
   background-color: var(--color-complementary-light);
   cursor: pointer;
@@ -409,6 +419,16 @@ button.not-yet::after {
   }
 }
 
+@media (max-width: 500px) {
+  :root {
+    --square-size: 23px;
+    --board-gap: 1px;
+    --board-size: calc(
+      calc(var(--square-size) * 10) + calc(var(--board-gap) * 10)
+    );
+  }
+}
+
 @keyframes wave {
   0% {
     transform: translate(-50%, -75%) rotate(0deg);
@@ -417,16 +437,6 @@ button.not-yet::after {
   100% {
     transform: translate(-50%, -75%) rotate(360deg);
   }
-}
-
-button.ready:hover {
-  background-image: linear-gradient(
-    to right,
-    var(--color-complementary-light) 0%,
-    var(--color-water) 50%,
-    var(--color-complementary-light) 100%
-  );
-  animation: slidebg 2s linear infinite;
 }
 
 @keyframes slidebg {
