@@ -44,9 +44,11 @@ function play1(rowCoord, columnCoord) {
     if (model.player2Board.areAllShipsSunk()) {
       // If you won
       view.updateDisplay("You won!");
+      view.updateWin();
     } else if (model.player1Board.areAllShipsSunk()) {
       // If player 2 won
       view.updateDisplay("Sorry, you lost!");
+      view.updateLoose();
     } else {
       // If nobody won, continue playing
       play2();
@@ -58,7 +60,7 @@ function play1(rowCoord, columnCoord) {
 // Player 2 turn
 function play2(minWait = 2000, closeTo = null, sankShip = false) {
   // play 2
-  view.updateDisplay("Player2 turn");
+  view.updateDisplay("Opponent's turn");
   setTimeout(() => {
     let coords;
     let hit;
@@ -73,10 +75,11 @@ function play2(minWait = 2000, closeTo = null, sankShip = false) {
     // Only stop turn after not hitting a target
     if (hit.ship !== undefined) {
       // Recursive call
-      play2(minWait + 2000, coords, hit.ship.isSunk());
+      play2(minWait + 1000, coords, hit.ship.isSunk());
     } else if (model.player1Board.areAllShipsSunk()) {
       // If player 2 won stop the game
       view.updateDisplay("Sorry, you lost!");
+      view.updateLoose();
     } else {
       // Otherwise, continue game
       makeEnemySquaresClickable();

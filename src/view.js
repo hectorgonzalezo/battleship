@@ -1,4 +1,5 @@
 import PubSub from "pubsub-js";
+import confetti from "canvas-confetti";
 
 const player1DivBoard = document.querySelector("#player1-board");
 const player2DivBoard = document.querySelector("#player2-board");
@@ -66,9 +67,20 @@ function updateBoardAt(board, rowCoord, columnCoord, updatingHits = false) {
 
 function updateDisplay(string) {
   infoDisplay.classList.remove("typing");
+  // Magic step!
   void infoDisplay.offsetWidth;
+
   infoDisplay.innerText = string;
   infoDisplay.classList.add("typing");
+}
+
+function updateLoose() {
+  infoDisplay.classList.add("loose");
+}
+
+function updateWin() {
+  infoDisplay.classList.add("win");
+  confetti();
 }
 
 async function startBoards(player2Board) {
@@ -93,6 +105,8 @@ const view = {
   renderShips,
   updateBoardAt,
   updateDisplay,
+  updateLoose,
+  updateWin,
 };
 
 export default view;

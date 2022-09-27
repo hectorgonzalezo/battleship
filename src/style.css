@@ -37,13 +37,25 @@ body {
   height: 100vh;
   width: 100vw;
   display: grid;
-  grid-template-rows: 1fr 5fr 50px;
+  grid-template-rows: 1fr 6fr 50px;
+  grid-template-areas:
+    "header"
+    "main"
+    "footer";
   align-items: center;
+  justify-items: center;
+}
+
+#game,
+#pop-up {
+  transition: left 2s;
+  transition: opacity 2s;
 }
 
 #pop-up.inactive,
 #game.inactive {
-  display: none;
+  /* display: none; */
+  opacity: 0;
   position: absolute;
   left: -100%;
   transition: all 2s;
@@ -60,19 +72,29 @@ header {
   justify-content: center;
   align-self: end;
   position: relative;
+  grid-area: header;
+  width: 100%;
+  min-height: 80px;
 }
 
 header h1 {
   color: var(--color-complementary-light);
-  font-size: 2rem;
+  font-size: 3rem;
   letter-spacing: 0.2rem;
-  /* outline: solid 1px var(--color-light); */
+}
+
+h1.win {
+  color: rgb(100, 238, 100);
+}
+
+h1.loose {
+  color: rgb(238, 100, 100);
 }
 
 header > button {
   position: absolute;
-  top: 80px;
-  right: min(5vw, 80px);
+  bottom: -30px;
+  right: min(1vw, 80px);
 }
 
 header > div > h1.typing {
@@ -92,6 +114,7 @@ main {
   justify-items: center;
   gap: auto;
   align-items: center;
+  grid-area: main;
 }
 
 main > h1 {

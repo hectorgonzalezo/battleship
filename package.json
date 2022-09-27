@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "babel-jest": "^29.0.3",
+    "canvas-confetti": "^1.5.1",
     "pubsub-js": "^1.9.4"
   },
   "description": "",
