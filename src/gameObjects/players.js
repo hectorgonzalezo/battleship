@@ -20,6 +20,8 @@ function Player(oponentGameboard, number) {
 
 function AIPlayer(oponentGameboard, number) {
   const prototype = Player(oponentGameboard, number);
+  // Memoization for number of tries of playAround, after a certain number stop and just choose random
+  let playAroundTries = 0;
 
   function playRandom() {
     let randomRow = getRandomNumber();
@@ -65,10 +67,14 @@ function AIPlayer(oponentGameboard, number) {
 
     // If those coords are occupied choose another set by calling recursively
     if (
-      hitChecker.isCoordOutOfBounds([randomRow, randomColumn]) ||
-      hitChecker.isAlreadyHit(tentativeLocation)
+     (hitChecker.isCoordOutOfBounds([randomRow, randomColumn]) ||
+      hitChecker.isAlreadyHit(tentativeLocation) 
+     ) && playAroundTries < 10
     ) {
+        playAroundTries++;
       [[randomRow, randomColumn], hit] = playAround(coords);
+    } else if(playAroundTries >=10) {
+        hit = playRandom()[1]
     } else {
       // base case
       // the hit bubbles up the stack

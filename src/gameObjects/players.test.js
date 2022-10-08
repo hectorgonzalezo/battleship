@@ -38,14 +38,27 @@ describe("Player functionality", () => {
     expect(updatedBoard).not.toEqual(previousBoard);
   });
 
-  test("AIPlayer.playAround doesn't get stuck on corners", () =>{
+  test("Limits AIPlayer.playAround recursive depth", () =>{
     const newGameboard = Gameboard();
-    const newShip = Ship(3);
-    newGameboard.placeShip(newShip, 0, 7); 
+    const newShip = Ship(4);
+    newGameboard.placeShip(newShip, 0, 6); 
     const newAIPlayer = AIPlayer(newGameboard, 1);
     newAIPlayer.playTurn(0, 7);
     newAIPlayer.playTurn(0, 8);
+    newAIPlayer.playTurn(1, 9);
+    newAIPlayer.playTurn(0, 9);
+
+    const previousBoard = JSON.parse(
+        JSON.stringify(newGameboard.getCurrentBoard())
+      );
+
+    newAIPlayer.playAround([0, 9])
 
     expect(newShip.isSunk()).toBe(false);
+
+    const updatedBoard = JSON.parse(
+        JSON.stringify(newGameboard.getCurrentBoard())
+      );
+      expect(updatedBoard).not.toEqual(previousBoard);
   })
 });
