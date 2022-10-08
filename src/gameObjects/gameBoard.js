@@ -161,7 +161,7 @@ const Gameboard = function (playerNumber) {
         }
 
         return ship;
-      }
+      } else if (direction === "vertical"){
       // if direction is vertical
       for (let i = 0; i < length; i++) {
         const positionObject = boardSquares[rowCoord + i][columnCoord];
@@ -173,6 +173,8 @@ const Gameboard = function (playerNumber) {
       return ship;
     }
   }
+  return
+}
 
   function receiveAttack(rowCoord, columnCoord) {
     if (!areAllShipsSunk()) {

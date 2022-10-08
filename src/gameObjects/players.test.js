@@ -37,4 +37,15 @@ describe("Player functionality", () => {
     );
     expect(updatedBoard).not.toEqual(previousBoard);
   });
+
+  test("AIPlayer.playAround doesn't get stuck on corners", () =>{
+    const newGameboard = Gameboard();
+    const newShip = Ship(3);
+    newGameboard.placeShip(newShip, 0, 7); 
+    const newAIPlayer = AIPlayer(newGameboard, 1);
+    newAIPlayer.playTurn(0, 7);
+    newAIPlayer.playTurn(0, 8);
+
+    expect(newShip.isSunk()).toBe(false);
+  })
 });

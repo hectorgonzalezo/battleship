@@ -123,7 +123,6 @@ describe("Gameboard funcionality", () => {
       JSON.stringify(newGameboard.getCurrentBoard())
     );
 
-    // Don't update if ship is to big for available space horizontally
     newGameboard.placeShip(Ship(3), 2, 2, "horizon");
     const newBoard = JSON.parse(JSON.stringify(newGameboard.getCurrentBoard()));
 
