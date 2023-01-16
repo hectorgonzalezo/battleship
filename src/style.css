@@ -27,14 +27,13 @@
 } */
 body {
   position: relative;
-  height: 100vh;
   width: 100vw;
   color: var(--color-light);
 }
 
 #game {
   background-color: var(--color-background);
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
   display: grid;
   grid-template-rows: 1fr 6fr 50px;
@@ -421,10 +420,10 @@ button.not-yet::after {
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
   :root {
-    --square-size: 23px;
-    --board-gap: 1px;
+    --square-size: 24px;
+    --board-gap: 2px;
     --board-size: calc(
       calc(var(--square-size) * 10) + calc(var(--board-gap) * 10)
     );
