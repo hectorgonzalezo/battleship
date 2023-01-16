@@ -345,6 +345,7 @@ button.not-yet::after {
 #pop-up button {
   grid-area: button;
   align-self: center;
+  margin-bottom: 25px;
 }
 
 #ships .ship.hide {
